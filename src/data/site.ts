@@ -30,11 +30,10 @@ export function getWhatsAppLink(lang: Locale): string {
 // TODO: replace with the real business inbox before launch.
 export const CONTACT_EMAIL = 'lj-solutions@outlook.es';
 
-// TODO: replace with real handles before launch.
 export function getSocialLinks(lang: Locale) {
   return {
-    instagram: 'https://instagram.com/ljsolutions',
-    tiktok: 'https://tiktok.com/@ljsolutions',
+    instagram: 'https://instagram.com/ljsolutions_2026',
+    tiktok: 'https://tiktok.com/@ljsolutions5',
     whatsapp: getWhatsAppLink(lang),
   };
 }
