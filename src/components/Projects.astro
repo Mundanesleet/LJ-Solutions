@@ -1,0 +1,23 @@
+---
+import { getProjects } from '../data/projects';
+import ProjectCard from './ProjectCard.astro';
+import { toLocale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang).projectsSection;
+const projects = getProjects(lang);
+---
+
+<section id="projects" class="border-t border-white/10 py-24 sm:py-32">
+  <div class="mx-auto max-w-content px-6">
+    <div class="mb-14 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between" data-reveal>
+      <h2 class="font-heading text-3xl font-medium tracking-tight text-cream sm:text-4xl">{t.heading}</h2>
+      <p class="max-w-sm text-mist">{t.sub}</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      {projects.map((project) => <ProjectCard project={project} />)}
+    </div>
+  </div>
+</section>

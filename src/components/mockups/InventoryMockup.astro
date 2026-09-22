@@ -1,0 +1,74 @@
+---
+// Conceptual UI mockup for the Inventory Management product.
+// All data below is illustrative placeholder content, not real metrics.
+import { toLocale } from '../../i18n/config';
+import { useTranslations } from '../../i18n/ui';
+
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang).inventoryMockup;
+
+const toneByStatus: Record<string, string> = {
+  'En stock': 'cream',
+  Bajo: 'orange',
+  Agotado: 'mist',
+  'In stock': 'cream',
+  Low: 'orange',
+  'Out of stock': 'mist',
+};
+
+const toneClasses: Record<string, string> = {
+  orange: 'bg-orange/15 text-orange',
+  cream: 'bg-cream/15 text-cream',
+  mist: 'bg-mist/15 text-mist',
+};
+---
+
+<div class={`rounded-3xl border border-white/10 bg-[#111111] p-5 sm:p-6 ${className}`} aria-hidden="true">
+  <div class="flex items-center justify-between">
+    <p class="font-heading text-lg font-medium text-cream">{t.title}</p>
+    <span class="rounded-full bg-orange/15 px-2.5 py-1 text-[11px] font-medium text-orange">{t.lowStockBadge}</span>
+  </div>
+
+  <div class="mt-4 overflow-hidden rounded-2xl border border-white/10">
+    <table class="w-full text-left">
+      <thead>
+        <tr class="bg-white/[0.03] text-[11px] uppercase tracking-wider text-mist">
+          <th class="px-4 py-2.5 font-medium">{t.headerProduct}</th>
+          <th class="px-4 py-2.5 font-medium">{t.headerStock}</th>
+          <th class="px-4 py-2.5 font-medium">{t.headerStatus}</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/5">
+        {
+          t.items.map((item) => (
+            <tr>
+              <td class="px-4 py-2.5 text-sm text-cream">{item.name}</td>
+              <td class="px-4 py-2.5 text-sm text-mist">{item.stock}</td>
+              <td class="px-4 py-2.5">
+                <span class={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-medium ${toneClasses[toneByStatus[item.status]]}`}>
+                  {item.status}
+                </span>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-5 grid grid-cols-2 gap-2 border-t border-white/10 pt-4">
+    <div>
+      <p class="font-heading text-xl font-medium text-cream">128</p>
+      <p class="text-[11px] text-mist">{t.statSkus}</p>
+    </div>
+    <div>
+      <p class="font-heading text-xl font-medium text-cream">+14</p>
+      <p class="text-[11px] text-mist">{t.statMovements}</p>
+    </div>
+  </div>
+</div>

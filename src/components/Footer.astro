@@ -1,0 +1,53 @@
+---
+import Logo from './Logo.astro';
+import { getFooterLinks, getSocialLinks, getTagline, SITE } from '../data/site';
+import { localizePath, toLocale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang).nav;
+const footerLinks = getFooterLinks(lang);
+const socialLinks = getSocialLinks(lang);
+const homeHref = localizePath(lang, '/#top');
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-white/10 py-16">
+  <div class="mx-auto max-w-content px-6">
+    <div class="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
+      <div class="max-w-xs">
+        <a href={homeHref} class="flex items-center gap-2.5" aria-label={t.homeAria}>
+          <Logo class="h-8 w-8" />
+          <span class="font-heading text-[15px] font-medium tracking-tight text-cream">LJ Solutions</span>
+        </a>
+        <p class="mt-4 text-sm leading-relaxed text-mist">{getTagline(lang)}</p>
+      </div>
+
+      <nav class="grid grid-cols-2 gap-x-10 gap-y-3 sm:flex sm:gap-10" aria-label="Footer">
+        {
+          footerLinks.map((link) => (
+            <a href={link.href} class="text-sm text-mist transition-colors hover:text-cream">
+              {link.label}
+            </a>
+          ))
+        }
+      </nav>
+
+      <div class="flex gap-5">
+        <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" class="text-sm text-mist transition-colors hover:text-orange">
+          Instagram
+        </a>
+        <a href={socialLinks.tiktok} target="_blank" rel="noopener noreferrer" class="text-sm text-mist transition-colors hover:text-orange">
+          TikTok
+        </a>
+        <a href={socialLinks.whatsapp} target="_blank" rel="noopener noreferrer" class="text-sm text-mist transition-colors hover:text-orange">
+          WhatsApp
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-14 border-t border-white/10 pt-6">
+      <p class="text-xs text-mist/70">© {year} {SITE.name}</p>
+    </div>
+  </div>
+</footer>

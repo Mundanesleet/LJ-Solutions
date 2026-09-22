@@ -1,0 +1,34 @@
+---
+import { localizePath, otherLocale, stripLocalePrefix, toLocale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+interface Props {
+  class?: string;
+}
+// Callers must include a display utility (e.g. "inline-flex" or "hidden sm:inline-flex")
+// in `class` — it's intentionally not baked into the base classes below, so a caller
+// hiding this responsively doesn't end up fighting itself over the `display` property.
+const { class: className = 'inline-flex' } = Astro.props;
+
+const lang = toLocale(Astro.currentLocale);
+const target = otherLocale(lang);
+const t = useTranslations(lang).languageSwitcher;
+
+const barePath = stripLocalePrefix(Astro.url.pathname, lang);
+const href = `${localizePath(target, barePath)}${Astro.url.hash}`;
+---
+
+<a
+  href={href}
+  class={`items-center gap-1.5 rounded-full border border-white/10 px-3.5 py-2 text-xs font-medium text-mist transition-colors duration-200 hover:text-cream ${className}`}
+  aria-label={t.ariaLabel}
+>
+  <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <path
+      d="M2.5 10H17.5M10 2.5C12.2 4.9 13.3 7.4 13.3 10C13.3 12.6 12.2 15.1 10 17.5C7.8 15.1 6.7 12.6 6.7 10C6.7 7.4 7.8 4.9 10 2.5Z"
+      stroke="currentColor"
+      stroke-width="1.3"
+    ></path>
+  </svg>
+  {t.switchTo}
+</a>

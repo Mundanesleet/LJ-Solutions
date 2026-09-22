@@ -1,0 +1,29 @@
+---
+import { toLocale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang).about;
+---
+
+<section id="about" class="bg-cream py-24 text-ink sm:py-32">
+  <div class="mx-auto max-w-content px-6">
+    <div class="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-8">
+      <div class="lg:col-span-5" data-reveal>
+        <span class="text-xs font-medium uppercase tracking-wider text-ink/50">{t.eyebrow}</span>
+        <h2 class="mt-4 font-heading text-3xl font-medium leading-[1.15] tracking-tight sm:text-4xl">
+          {t.heading}
+        </h2>
+      </div>
+
+      <div class="flex flex-col gap-6 lg:col-span-6 lg:col-start-7" data-reveal>
+        <p class="text-lg leading-relaxed text-ink/70">
+          {t.p1}
+        </p>
+        <p class="text-lg leading-relaxed text-ink/70">
+          {t.p2}
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

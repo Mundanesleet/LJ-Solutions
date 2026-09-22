@@ -1,0 +1,62 @@
+// Central place for contact + social configuration.
+// Update these values to change them site-wide.
+import { localizePath, type Locale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+export const SITE = {
+  name: 'LJ Solutions',
+  url: 'https://ljsolutions.com',
+};
+
+export function getTagline(lang: Locale): string {
+  const t = useTranslations(lang).hero;
+  return `${t.headlinePre} ${t.headlineHighlight} ${t.headlinePost}`;
+}
+
+export function getSiteDescription(lang: Locale): string {
+  return useTranslations(lang).seo.defaultDescription;
+}
+
+// WhatsApp number in international format (a leading "+" is fine, it's stripped below).
+export const WHATSAPP_NUMBER = '+573224047068';
+
+const WHATSAPP_DEFAULT_MESSAGE: Record<Locale, string> = {
+  es: 'Hola! Me gustaría hablar sobre un proyecto.',
+  en: "Hi! I'd like to talk about a project.",
+};
+
+export function getWhatsAppLink(lang: Locale): string {
+  const digits = WHATSAPP_NUMBER.replace(/\D/g, '');
+  return `https://wa.me/${digits}?text=${encodeURIComponent(WHATSAPP_DEFAULT_MESSAGE[lang])}`;
+}
+
+// TODO: replace with the real business inbox before launch.
+export const CONTACT_EMAIL = 'lj-solutions@outlook.es';
+
+// TODO: replace with real handles before launch.
+export function getSocialLinks(lang: Locale) {
+  return {
+    instagram: 'https://instagram.com/ljsolutions',
+    tiktok: 'https://tiktok.com/@ljsolutions',
+    whatsapp: getWhatsAppLink(lang),
+  };
+}
+
+// TODO: point this at a real form backend (Formspree, Getform, a custom API route, etc.)
+// The form in src/components/Contact.astro is wired to submit here.
+export const FORM_ENDPOINT = '';
+
+export function getNavLinks(lang: Locale) {
+  const t = useTranslations(lang).nav;
+  return [
+    { label: t.solutions, href: localizePath(lang, '/#solutions') },
+    { label: t.projects, href: localizePath(lang, '/#projects') },
+    { label: t.howWeWork, href: localizePath(lang, '/#how-we-work') },
+    { label: t.about, href: localizePath(lang, '/#about') },
+  ];
+}
+
+export function getFooterLinks(lang: Locale) {
+  const t = useTranslations(lang);
+  return [...getNavLinks(lang), { label: t.footer.contact, href: localizePath(lang, '/#contact') }];
+}

@@ -1,0 +1,75 @@
+---
+// Conceptual UI mockup for the Restaurant Management product.
+// All data below is illustrative placeholder content, not real metrics.
+import { toLocale } from '../../i18n/config';
+import { useTranslations } from '../../i18n/ui';
+
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang).dashboardMockup;
+
+const toneByStatus: Record<string, string> = {
+  Nuevo: 'orange',
+  'En curso': 'cream',
+  Listo: 'mist',
+  New: 'orange',
+  'In progress': 'cream',
+  Ready: 'mist',
+};
+
+const toneClasses: Record<string, string> = {
+  orange: 'bg-orange/15 text-orange',
+  cream: 'bg-cream/15 text-cream',
+  mist: 'bg-mist/15 text-mist',
+};
+---
+
+<div class={`rounded-3xl border border-white/10 bg-[#111111] p-5 sm:p-6 ${className}`} aria-hidden="true">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="relative flex h-2 w-2">
+        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange opacity-75"></span>
+        <span class="relative inline-flex h-2 w-2 rounded-full bg-orange"></span>
+      </span>
+      <span class="text-xs font-medium uppercase tracking-wider text-mist">{t.live}</span>
+    </div>
+    <span class="font-heading text-xs text-mist">18:42</span>
+  </div>
+
+  <p class="mt-4 font-heading text-lg font-medium text-cream">{t.title}</p>
+
+  <ul class="mt-4 space-y-2.5">
+    {
+      t.orders.map((order) => (
+        <li class="flex items-center justify-between gap-3 rounded-2xl bg-white/[0.03] px-4 py-3">
+          <div class="min-w-0">
+            <p class="truncate text-sm font-medium text-cream">{order.id}</p>
+            <p class="truncate text-xs text-mist">{order.item}</p>
+          </div>
+          <span class={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium ${toneClasses[toneByStatus[order.status]]}`}>
+            {order.status}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="mt-5 grid grid-cols-3 gap-2 border-t border-white/10 pt-4">
+    <div>
+      <p class="font-heading text-xl font-medium text-cream">12</p>
+      <p class="text-[11px] text-mist">{t.statActive}</p>
+    </div>
+    <div>
+      <p class="font-heading text-xl font-medium text-cream">6m</p>
+      <p class="text-[11px] text-mist">{t.statAvg}</p>
+    </div>
+    <div>
+      <p class="font-heading text-xl font-medium text-orange">4</p>
+      <p class="text-[11px] text-mist">{t.statFree}</p>
+    </div>
+  </div>
+</div>

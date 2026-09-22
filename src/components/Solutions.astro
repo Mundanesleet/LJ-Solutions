@@ -1,0 +1,62 @@
+---
+import { getProducts } from '../data/products';
+import DashboardMockup from './mockups/DashboardMockup.astro';
+import InventoryMockup from './mockups/InventoryMockup.astro';
+import BuildMockup from './mockups/BuildMockup.astro';
+import { localizePath, toLocale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+const mockups = {
+  dashboard: DashboardMockup,
+  inventory: InventoryMockup,
+  build: BuildMockup,
+};
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang).solutions;
+const products = getProducts(lang);
+---
+
+<section id="solutions" class="border-t border-white/10 py-24 sm:py-32">
+  <div class="mx-auto max-w-content px-6">
+    <h2 class="max-w-2xl font-heading text-3xl font-medium leading-[1.15] tracking-tight text-cream sm:text-4xl lg:text-[2.75rem]" data-reveal>
+      {t.heading}
+    </h2>
+
+    <div class="mt-20 flex flex-col gap-24 sm:gap-28">
+      {
+        products.map((product, i) => {
+          const Mockup = mockups[product.mockup];
+          const reversed = i % 2 === 1;
+          const href = product.href.startsWith('#') ? product.href : localizePath(lang, product.href);
+          return (
+            <div class={`grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-8`}>
+              <div class={`lg:col-span-6 ${reversed ? 'lg:order-2' : ''}`} data-reveal>
+                <Mockup />
+              </div>
+
+              <div class={`lg:col-span-6 ${reversed ? 'lg:order-1' : ''}`} data-reveal>
+                <div class="flex items-center gap-3">
+                  <span class="font-heading text-sm text-orange">{product.number}</span>
+                  <span class="text-xs font-medium uppercase tracking-wider text-mist">{product.category}</span>
+                </div>
+                <h3 class="mt-4 font-heading text-2xl font-medium text-cream sm:text-3xl">{product.title}</h3>
+                <p class="mt-4 max-w-md text-lg leading-relaxed text-mist">{product.description}</p>
+                <p class="mt-3 max-w-md text-sm leading-relaxed text-mist/70">{product.detail}</p>
+                <a
+                  href={href}
+                  class="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-cream transition-colors hover:text-orange"
+                >
+                  {product.cta}
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M3.5 12.5L12.5 3.5M12.5 3.5H5.5M12.5 3.5V10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>

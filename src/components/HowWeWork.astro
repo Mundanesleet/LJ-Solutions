@@ -1,0 +1,38 @@
+---
+import { getProcessSteps } from '../data/process';
+import { toLocale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang).howWeWork;
+const steps = getProcessSteps(lang);
+---
+
+<section id="how-we-work" class="border-t border-white/10 py-24 sm:py-32">
+  <div class="mx-auto max-w-content px-6">
+    <div class="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-8">
+      <div class="lg:col-span-4">
+        <h2 class="sticky top-28 font-heading text-3xl font-medium leading-[1.15] tracking-tight text-cream sm:text-4xl" data-reveal>
+          {t.heading}
+        </h2>
+      </div>
+
+      <div class="lg:col-span-8">
+        {
+          steps.map((step, i) => (
+            <div
+              class={`flex items-baseline gap-6 py-8 sm:gap-10 ${i !== 0 ? 'border-t border-white/10' : ''}`}
+              data-reveal
+            >
+              <span class="font-heading text-4xl font-medium text-orange/25 sm:text-5xl">{step.number}</span>
+              <div>
+                <h3 class="font-heading text-xl font-medium text-cream sm:text-2xl">{step.title}</h3>
+                <p class="mt-2 text-mist">{step.description}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

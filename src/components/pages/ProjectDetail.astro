@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Navbar from '../Navbar.astro';
+import Footer from '../Footer.astro';
+import Button from '../Button.astro';
+import DashboardMockup from '../mockups/DashboardMockup.astro';
+import InventoryMockup from '../mockups/InventoryMockup.astro';
+import { getProjectBySlug } from '../../data/projects';
+import { localizePath, toLocale } from '../../i18n/config';
+import { useTranslations } from '../../i18n/ui';
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang).projectDetail;
+const project = getProjectBySlug(lang, slug);
+
+if (!project) {
+  throw new Error(`Unknown project slug: ${slug}`);
+}
+
+const mockups = { dashboard: DashboardMockup, inventory: InventoryMockup };
+const Mockup = mockups[project.mockup];
+
+const statusClasses = project.statusKey === 'inDevelopment' ? 'bg-orange/15 text-orange' : 'bg-white/10 text-mist';
+const projectsHref = localizePath(lang, '/projects');
+---
+
+<BaseLayout title={`${project.title} — LJ Solutions`} description={project.summary}>
+  <Navbar />
+  <main class="pb-24 pt-36 sm:pt-44">
+    <div class="mx-auto max-w-content px-6">
+      <a href={projectsHref} class="inline-flex items-center gap-2 text-sm text-mist transition-colors hover:text-cream" data-reveal>
+        <svg class="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M12.5 3.5L3.5 12.5M3.5 12.5H10.5M3.5 12.5V5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        {t.backLink}
+      </a>
+
+      <div class="mt-8 grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-8">
+        <div class="lg:col-span-5" data-reveal>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-medium uppercase tracking-wider text-mist">{project.category}</span>
+            <span class={`rounded-full px-2.5 py-1 text-[11px] font-medium ${statusClasses}`}>{project.status}</span>
+          </div>
+          <h1 class="mt-4 font-heading text-4xl font-medium leading-[1.1] tracking-tight text-cream sm:text-5xl">
+            {project.title}
+          </h1>
+          <p class="mt-6 text-lg leading-relaxed text-mist">{project.description}</p>
+
+          <div class="mt-9">
+            <Button href={localizePath(lang, '/#contact')} variant="primary">{t.cta}</Button>
+          </div>
+        </div>
+
+        <div class="lg:col-span-6 lg:col-start-7" data-reveal>
+          <Mockup />
+        </div>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>

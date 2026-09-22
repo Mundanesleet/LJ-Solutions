@@ -1,0 +1,35 @@
+---
+import { toLocale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang).customSoftwareCta;
+---
+
+<section class="bg-orange py-24 sm:py-32">
+  <div class="mx-auto max-w-content px-6">
+    <div class="grid grid-cols-1 items-end gap-10 lg:grid-cols-12">
+      <h2
+        class="font-heading text-4xl font-medium leading-[1.05] tracking-tight text-ink sm:text-5xl lg:col-span-8 lg:text-6xl"
+        data-reveal
+      >
+        {t.headline1}<br />{t.headline2}
+      </h2>
+
+      <div class="lg:col-span-4" data-reveal>
+        <p class="text-lg leading-relaxed text-ink/80">
+          {t.sub}
+        </p>
+        <a
+          href="#contact"
+          class="mt-7 inline-flex items-center gap-2.5 rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-cream transition-colors duration-300 hover:bg-cream hover:text-ink"
+        >
+          {t.cta}
+          <svg class="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3.5 12.5L12.5 3.5M12.5 3.5H5.5M12.5 3.5V10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

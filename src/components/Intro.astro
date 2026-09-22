@@ -1,0 +1,33 @@
+---
+import { toLocale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang).intro;
+---
+
+<section class="border-t border-white/10 py-24 sm:py-32">
+  <div class="mx-auto max-w-content px-6">
+    <div class="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8">
+      <div class="lg:col-span-8" data-reveal>
+        <h2 class="max-w-xl font-heading text-3xl font-medium leading-[1.15] tracking-tight text-cream sm:text-4xl lg:text-[2.75rem]">
+          {t.heading}
+        </h2>
+        <p class="mt-6 max-w-xl text-lg leading-relaxed text-mist">
+          {t.paragraph}
+        </p>
+      </div>
+
+      <div class="flex flex-col justify-center gap-0 lg:col-span-4" data-reveal>
+        {
+          t.points.map((point, i) => (
+            <div class={`flex items-center gap-4 py-4 ${i !== 0 ? 'border-t border-white/10' : ''}`}>
+              <span class="font-heading text-sm text-orange">{String(i + 1).padStart(2, '0')}</span>
+              <span class="font-heading text-lg text-cream">{point}</span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
