@@ -3,18 +3,15 @@
 import { localizePath, type Locale } from '../i18n/config';
 import { useTranslations } from '../i18n/ui';
 
+// The deployed origin lives in `site` in astro.config.mjs (read via Astro.site), not here —
+// keeping one source of truth avoids it drifting out of sync across environments.
 export const SITE = {
   name: 'LJ Solutions',
-  url: 'https://ljsolutions.com',
 };
 
 export function getTagline(lang: Locale): string {
   const t = useTranslations(lang).hero;
   return `${t.headlinePre} ${t.headlineHighlight} ${t.headlinePost}`;
-}
-
-export function getSiteDescription(lang: Locale): string {
-  return useTranslations(lang).seo.defaultDescription;
 }
 
 // WhatsApp number in international format (a leading "+" is fine, it's stripped below).

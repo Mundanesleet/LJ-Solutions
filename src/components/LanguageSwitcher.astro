@@ -1,5 +1,5 @@
 ---
-import { localizePath, otherLocale, stripLocalePrefix, toLocale } from '../i18n/config';
+import { localizePath, otherLocale, toBarePath, toLocale } from '../i18n/config';
 import { useTranslations } from '../i18n/ui';
 
 interface Props {
@@ -14,7 +14,7 @@ const lang = toLocale(Astro.currentLocale);
 const target = otherLocale(lang);
 const t = useTranslations(lang).languageSwitcher;
 
-const barePath = stripLocalePrefix(Astro.url.pathname, lang);
+const barePath = toBarePath(Astro.url.pathname, lang);
 const href = `${localizePath(target, barePath)}${Astro.url.hash}`;
 ---
 
