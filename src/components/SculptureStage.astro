@@ -1,0 +1,140 @@
+---
+/**
+ * Page-level stage for the sculpture: one renderer shared by every scene.
+ * Sections opt in with data-sculpture-scene (see src/scripts/sculpture-director.ts).
+ *
+ * With motion allowed the stage is fixed to the viewport so the figure can travel
+ * between scenes. With reduced motion it sits still behind the first screen.
+ */
+import HeroSculpture from './HeroSculpture.astro';
+---
+
+<div class="stage pointer-events-none" data-stage>
+  <div class="stage__orb" data-stage-orb>
+    <HeroSculpture />
+  </div>
+</div>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 100svh;
+    z-index: -10;
+  }
+
+  :global(html.motion-ok) .stage {
+    position: fixed;
+    inset: 0;
+    height: auto;
+  }
+
+  /* Rest pose (hero scene). Mobile: crowns the top of the screen above the copy. */
+  .stage__orb {
+    position: absolute;
+    width: min(120vw, 580px);
+    right: -30vw;
+    top: 3.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .stage__orb {
+      width: min(88vw, 660px);
+      right: -14vw;
+      top: 2.5rem;
+    }
+  }
+
+  /* Desktop: owns the right half, cropped by the viewport edge. */
+  @media (min-width: 1024px) {
+    .stage__orb {
+      --size: min(58vw, 62rem, 108svh);
+      width: var(--size);
+      right: -9vw;
+      /* Centred with top, not translate, so GSAP owns the transform cleanly. */
+      top: calc(50% - var(--size) / 2);
+    }
+  }
+
+  /* Hidden until its entrance plays (only when motion is allowed and JS runs). */
+  :global(html.hero-anim) [data-sculpture] {
+    opacity: 0;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { supportsSculpture } from '../scripts/sculpture-support';
+  import { directSculpture } from '../scripts/sculpture-director';
+  import type { SculptureController, SculptureState } from '../scripts/sculpture';
+
+  const root = document.documentElement;
+  const orb = document.querySelector<HTMLElement>('[data-stage-orb]');
+  const sculptureEl = document.querySelector<HTMLElement>('[data-sculpture]');
+  const canvasHost = document.querySelector<HTMLElement>('[data-sculpture-canvas]');
+  const fallback = document.querySelector<SVGElement>('[data-sculpture-fallback]');
+
+  if (orb && sculptureEl && canvasHost && fallback) {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const state: SculptureState = { scroll: 0, px: 0, py: 0 };
+    let controller: SculptureController | undefined;
+    let active = true;
+
+    // --- Renderer: WebGL when the device can afford it, SVG otherwise --------
+    if (supportsSculpture()) {
+      fallback.setAttribute('hidden', '');
+      const load = () =>
+        import('../scripts/sculpture')
+          .then(({ mountSculpture }) => {
+            controller = mountSculpture(canvasHost, { state, reducedMotion });
+            controller.setActive(active);
+          })
+          .catch(() => fallback.removeAttribute('hidden'));
+      // Fetch and compile only after the page has fully loaded and the main thread is
+      // idle, so the 3D bundle never competes with first paint or first input. The
+      // intro (or the hero's own entrance) covers this delay visually.
+      const schedule = () => {
+        if ('requestIdleCallback' in window) requestIdleCallback(load, { timeout: 1500 });
+        else setTimeout(load, 200);
+      };
+      if (document.readyState === 'complete') schedule();
+      else window.addEventListener('load', schedule, { once: true });
+    }
+
+    if (!reducedMotion) {
+      // --- Entrance, in step with the hero copy --------------------------------
+      const enter = gsap.fromTo(
+        sculptureEl,
+        { opacity: 0, scale: 0.86 },
+        { opacity: 1, scale: 1, duration: 2, ease: 'expo.out', paused: true }
+      );
+      if (root.classList.contains('intro-on')) {
+        window.addEventListener('lj:intro-reveal', () => enter.play(), { once: true });
+      } else {
+        enter.play();
+      }
+
+      // --- Scenes ----------------------------------------------------------------
+      directSculpture({
+        orb,
+        state,
+        onActive: (next) => {
+          active = next;
+          controller?.setActive(next);
+        },
+      });
+
+      // --- Pointer depth (fine pointers only) ------------------------------------
+      if (window.matchMedia('(pointer: fine)').matches) {
+        window.addEventListener(
+          'pointermove',
+          (e) => {
+            state.px = e.clientX / window.innerWidth - 0.5;
+            state.py = e.clientY / window.innerHeight - 0.5;
+          },
+          { passive: true }
+        );
+      }
+    }
+  }
+</script>

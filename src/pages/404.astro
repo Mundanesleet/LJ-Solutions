@@ -1,0 +1,42 @@
+---
+/**
+ * Not-found page. GitHub Pages serves dist/404.html for any unknown URL under the
+ * site, in both languages, so it speaks Spanish first with an English line below.
+ */
+import PageLayout from '../layouts/PageLayout.astro';
+import Button from '../components/Button.astro';
+import { routePath } from '../i18n/routes';
+---
+
+<PageLayout title="Página no encontrada — LJ Solutions" description="La página que buscas no existe o fue movida.">
+  <meta name="robots" content="noindex" slot="head" />
+  <section class="relative flex min-h-[80svh] items-center overflow-hidden bg-surface pb-20 pt-32">
+    <div class="nf-glow pointer-events-none absolute" aria-hidden="true"></div>
+    <div class="container-page relative flex flex-col items-start gap-6">
+      <p class="text-[6rem] font-extrabold leading-none tracking-tight text-orange/30 sm:text-[9rem]" aria-hidden="true">404</p>
+      <h1 class="text-display-sm text-cream md:text-display">Página no encontrada</h1>
+      <p class="max-w-xl text-body-lg text-cream/75">
+        La página que buscas no existe o fue movida. Puedes volver al inicio o escribirnos si necesitas ayuda.
+      </p>
+      <div class="flex flex-wrap gap-3 pt-2 sm:gap-4">
+        <Button href={routePath('es', 'home')} trailingIcon="arrow_forward" size="lg">Ir al inicio</Button>
+        <Button href={routePath('es', 'contact')} variant="secondary" size="lg">Contacto</Button>
+      </div>
+      <p class="mt-6 text-body-sm text-cream/60" lang="en">
+        Page not found. <a href={routePath('en', 'home')} class="text-orange underline-offset-4 hover:underline">Go to the English site</a>.
+      </p>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .nf-glow {
+    top: -8rem;
+    right: -6rem;
+    width: 34rem;
+    height: 34rem;
+    border-radius: 9999px;
+    background: rgb(255 77 0 / 0.1);
+    filter: blur(130px);
+  }
+</style>

@@ -1,0 +1,218 @@
+---
+/**
+ * Opening sequence (~3 s), text only:
+ *   1. "LJ Solutions" writes itself letter by letter in one continuous cascade.
+ *   2. An orange light travels across the word, easing in as it leaves.
+ *   3. The letters lift away from the centre outwards.
+ *   4. A curtain with a glowing edge rises to reveal the hero.
+ *
+ * Letters animate with transform and opacity only (compositor-friendly).
+ * Shown once per browser session. Never shown with prefers-reduced-motion, without
+ * JS, or when the visitor lands on a #section link. Click, tap or any key skips it.
+ * Visibility is decided before first paint by the inline head script in Home.astro.
+ */
+import { toLocale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang).splash;
+
+// L cream · J orange · Solutions cream
+const chars = [...'LJ Solutions'].map((c, i) => ({
+  c: c === ' ' ? ' ' : c,
+  orange: i === 1,
+}));
+---
+
+<div class="splash" data-splash>
+  <div class="splash__panel" data-splash-panel>
+    <p class="splash__word font-heading" aria-hidden="true">
+      <span class="splash__base">
+        {chars.map(({ c, orange }) => <span class:list={['splash__char', orange && 'is-orange']} data-splash-char>{c}</span>)}
+      </span>
+      <!-- Incandescent copy of the word, seen only through the travelling light band. -->
+      <span class="splash__hot" data-splash-flare>
+        {chars.map(({ c }) => <span class="splash__char">{c}</span>)}
+      </span>
+    </p>
+    <span class="splash__edge" data-splash-edge aria-hidden="true"></span>
+  </div>
+
+  <button type="button" class="splash__skip" data-splash-skip>{t.skip}</button>
+</div>
+
+<style>
+  .splash {
+    display: none;
+  }
+
+  :global(html.intro-on) .splash {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: block;
+  }
+
+  :global(html.intro-on) body {
+    overflow: hidden;
+  }
+
+  .splash__panel {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: #000;
+    will-change: transform;
+  }
+
+  .splash__edge {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--color-orange);
+    box-shadow: 0 0 1.5rem 0.25rem color-mix(in oklab, var(--color-orange) 55%, transparent);
+    opacity: 0;
+  }
+
+  .splash__word {
+    position: relative;
+    display: grid;
+    font-size: clamp(3rem, 1.6rem + 6vw, 6rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .splash__base,
+  .splash__hot {
+    grid-area: 1 / 1;
+  }
+
+  .splash__char {
+    display: inline-block;
+    color: var(--color-cream);
+  }
+
+  .splash__char.is-orange {
+    color: var(--color-orange);
+  }
+
+  .splash__base .splash__char {
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  .splash__hot {
+    --p: -30%;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(
+      105deg,
+      transparent calc(var(--p) - 14%),
+      #000 var(--p),
+      transparent calc(var(--p) + 14%)
+    );
+    mask-image: linear-gradient(105deg, transparent calc(var(--p) - 14%), #000 var(--p), transparent calc(var(--p) + 14%));
+  }
+
+  .splash__hot .splash__char {
+    color: color-mix(in oklab, var(--color-orange) 72%, var(--color-cream));
+    text-shadow:
+      0 0 0.18em color-mix(in oklab, var(--color-orange) 85%, transparent),
+      0 0 0.7em color-mix(in oklab, var(--color-orange) 50%, transparent);
+  }
+
+  .splash__skip {
+    position: absolute;
+    bottom: max(1.5rem, env(safe-area-inset-bottom));
+    left: 50%;
+    translate: -50% 0;
+    padding: 0.6rem 1rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    color: var(--color-mist);
+    transition: color 0.2s;
+  }
+
+  .splash__skip:hover {
+    color: var(--color-cream);
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const root = document.documentElement;
+  const splash = document.querySelector<HTMLElement>('[data-splash]');
+
+  if (splash && root.classList.contains('intro-on')) {
+    const panel = splash.querySelector<HTMLElement>('[data-splash-panel]')!;
+    const chars = splash.querySelectorAll<HTMLElement>('[data-splash-char]');
+    const flare = splash.querySelector<HTMLElement>('[data-splash-flare]')!;
+    const edge = splash.querySelector<HTMLElement>('[data-splash-edge]')!;
+    const skipBtn = splash.querySelector<HTMLElement>('[data-splash-skip]')!;
+
+    let revealed = false;
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
+      window.dispatchEvent(new CustomEvent('lj:intro-reveal'));
+    };
+
+    const finish = () => {
+      try {
+        sessionStorage.setItem('lj-intro', '1');
+      } catch {}
+      root.classList.remove('intro-on');
+      splash.remove();
+      window.removeEventListener('keydown', onKey);
+    };
+
+    const TYPE = 0.15; // writing starts
+    const LIGHT = 1.3; // light sweep starts
+    const EXIT = 2.1; // letters leave
+    const CURTAIN = 2.4; // curtain rises
+
+    const tl = gsap.timeline({ paused: true, onComplete: finish });
+
+    tl
+      // 1. Writing: overlapping letters give one continuous motion, not ticks.
+      .fromTo(
+        chars,
+        { opacity: 0, yPercent: 38 },
+        { opacity: 1, yPercent: 0, duration: 0.55, ease: 'power3.out', stagger: 0.07 },
+        TYPE
+      )
+      // 2. Light sweep: eases in, so it accelerates gently as it leaves the word.
+      .fromTo(flare, { '--p': '-30%' }, { '--p': '135%', duration: 0.85, ease: 'power2.in' }, LIGHT)
+      // 3. Letters lift away from the centre outwards.
+      .to(
+        chars,
+        { opacity: 0, yPercent: -45, duration: 0.42, ease: 'power2.in', stagger: { each: 0.025, from: 'center' } },
+        EXIT
+      )
+      .set(flare, { opacity: 0 }, EXIT)
+      .to(skipBtn, { opacity: 0, duration: 0.25 }, EXIT)
+      // 4. Curtain rises with a glowing edge; the hero starts entering underneath.
+      .set(edge, { opacity: 1 }, CURTAIN)
+      .to(panel, { yPercent: -100, duration: 0.65, ease: 'expo.inOut' }, CURTAIN)
+      .call(reveal, [], CURTAIN + 0.12);
+
+    const skip = () => {
+      if (tl.time() < EXIT) tl.seek(EXIT);
+    };
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') skip();
+    };
+
+    splash.addEventListener('click', skip);
+    window.addEventListener('keydown', onKey);
+
+    // Wait briefly for the display face so letters never swap fonts mid-animation.
+    Promise.race([document.fonts?.ready, new Promise((r) => setTimeout(r, 350))]).then(() => tl.play());
+  }
+</script>

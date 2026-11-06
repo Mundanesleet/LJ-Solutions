@@ -1,0 +1,40 @@
+---
+/**
+ * Inline SVG icon. Glyphs are Material Symbols Outlined (the set used in the
+ * approved designs), saved as individual files in src/icons so no icon font is
+ * loaded. Brand marks (brand-*) come from Simple Icons.
+ *
+ *   <Icon name="chat" class="size-[18px]" />
+ *
+ * Icons are decorative by default; pass `label` when the icon carries meaning alone.
+ */
+interface Props {
+  name: string;
+  class?: string;
+  label?: string;
+}
+
+const files = import.meta.glob<string>('../../icons/*.svg', { query: '?raw', import: 'default', eager: true });
+const { name, class: className = 'size-5', label } = Astro.props;
+
+const raw = files[`../../icons/${name}.svg`];
+if (!raw) throw new Error(`Icon "${name}" not found in src/icons`);
+
+const viewBox = raw.match(/viewBox="([^"]+)"/)?.[1] ?? '0 0 24 24';
+const inner = raw
+  .replace(/^[\s\S]*?<svg[^>]*>/, '')
+  .replace(/<\/svg>\s*$/, '')
+  .replace(/<title>[\s\S]*?<\/title>/, '');
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox={viewBox}
+  fill="currentColor"
+  class:list={['shrink-0', className]}
+  aria-hidden={label ? undefined : 'true'}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  focusable="false"
+  set:html={inner}
+/>

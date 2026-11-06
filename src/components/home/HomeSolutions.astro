@@ -1,0 +1,84 @@
+---
+/** Home · "Explora nuestras soluciones": one card per service, linking to its page. */
+import { Image } from 'astro:assets';
+import Icon from '../ui/Icon.astro';
+import SectionHeader from '../ui/SectionHeader.astro';
+import { toLocale } from '../../i18n/config';
+import { routePath, SERVICE_ROUTES } from '../../i18n/routes';
+import { useTranslations } from '../../i18n/ui';
+import webImg from '../../assets/home/solution-web.jpg';
+import agentsImg from '../../assets/home/solution-agents.jpg';
+import managementImg from '../../assets/home/solution-management.jpg';
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang);
+const s = t.home.solutions;
+
+const VISUALS = {
+  webDev: { img: webImg, icon: 'laptop_mac' },
+  aiAgents: { img: agentsImg, icon: 'smart_toy' },
+  management: { img: managementImg, icon: 'analytics' },
+} as const;
+
+const cards = SERVICE_ROUTES.map((key, i) => ({
+  key,
+  n: String(i + 1).padStart(2, '0'),
+  title: t.services[key],
+  href: routePath(lang, key),
+  ...VISUALS[key],
+  ...s.items[key],
+}));
+---
+
+<section id="soluciones" class="bg-ink py-16 md:py-24" aria-labelledby="soluciones-title">
+  <div class="container-page">
+    <SectionHeader id="soluciones-title" title={s.title} sub={s.sub} class="mb-10 md:mb-14" />
+
+    <ul class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {
+        cards.map((c, i) => (
+          <li
+            class:list={[
+              'group flex flex-col rounded-2xl bg-surface-low p-5 shadow-sm transition-all duration-300 hover:bg-surface-1 hover:shadow-xl sm:p-6',
+              // Tablet: the odd third card spans the row, laid out horizontally.
+              i === 2 &&
+                'md:col-span-2 md:grid md:grid-cols-2 md:items-center md:gap-6 lg:col-span-1 lg:flex lg:items-stretch lg:gap-0',
+            ]}
+            data-reveal
+            style={`transition-delay:${i * 80}ms`}
+          >
+            <div class="overflow-hidden rounded-xl bg-ink">
+              <Image
+                src={c.img}
+                alt={c.alt}
+                widths={[400, 640, 900]}
+                sizes="(min-width: 1024px) 340px, (min-width: 768px) 50vw, 100vw"
+                class="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+            </div>
+
+            <div class:list={['flex flex-1 flex-col', i === 2 && 'md:mt-0 lg:mt-0']}>
+              <div class:list={['mt-6 flex flex-1 flex-col gap-3', i === 2 && 'md:mt-0 lg:mt-6']}>
+                <span class="eyebrow inline-flex items-center gap-2">
+                  <Icon name={c.icon} class="size-6" />
+                  {c.n}. {s.label}
+                </span>
+                <h3 class="text-h2 text-cream">{c.title}</h3>
+                <p class="text-body text-cream/70">{c.desc}</p>
+              </div>
+
+              <a
+                href={c.href}
+                class="mt-6 flex w-full items-center justify-between rounded-xl bg-surface-2 px-4 py-3 text-label text-cream transition-colors group-hover:bg-orange group-hover:text-ink"
+              >
+                {c.cta}
+                <Icon name="arrow_forward" class="size-[18px]" />
+              </a>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,61 @@
+---
+/**
+ * Single-choice group rendered as icon tiles (Stitch "Servicio de interés").
+ * Real radio inputs underneath, so arrow keys, form submission and required
+ * validation work natively; the tiles are just their styled labels.
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  name: string;
+  legend: string;
+  options: { value: string; label: string; icon: string }[];
+  required?: boolean;
+  class?: string;
+}
+
+const { name, legend, options, required = false, class: className = '' } = Astro.props;
+const errorId = `field-${name}-error`;
+---
+
+<fieldset class:list={['flex flex-col gap-2', className]} aria-describedby={errorId} data-field>
+  <legend class="mb-2 flex w-full items-center justify-between text-label-md uppercase text-cream">
+    <span>{legend}</span>
+    {required && <span class="text-orange" aria-hidden="true">*</span>}
+  </legend>
+  <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+    {
+      options.map((o, i) => (
+        <label class="choice relative flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-transparent bg-surface-low px-3 py-4 text-center text-label-md text-cream/80 transition-colors hover:bg-surface-2">
+          <input
+            type="radio"
+            name={name}
+            value={o.value}
+            required={required && i === 0}
+            class="peer sr-only"
+          />
+          <Icon name={o.icon} class="size-5 text-cream/70" />
+          <span>{o.label}</span>
+        </label>
+      ))
+    }
+  </div>
+  <p id={errorId} class="text-body-sm text-orange empty:hidden" aria-live="polite" data-field-error></p>
+</fieldset>
+
+<style>
+  .choice:has(input:checked) {
+    border-color: var(--color-orange);
+    background: color-mix(in oklab, var(--color-orange) 10%, var(--color-surface-low));
+    color: var(--color-cream);
+  }
+
+  .choice:has(input:checked) :global(svg) {
+    color: var(--color-orange);
+  }
+
+  .choice:has(input:focus-visible) {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 2px;
+  }
+</style>

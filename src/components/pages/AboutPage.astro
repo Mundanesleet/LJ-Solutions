@@ -1,0 +1,264 @@
+---
+/**
+ * Nosotros (Stitch "LJ Solutions — Nosotros").
+ * The founder portrait is the real photo supplied by the client, shown unaltered
+ * apart from the approved black-and-white treatment (a CSS filter).
+ */
+import { Image } from 'astro:assets';
+import PageLayout from '../../layouts/PageLayout.astro';
+import Breadcrumbs from '../ui/Breadcrumbs.astro';
+import SectionIntro from '../ui/SectionIntro.astro';
+import Icon from '../ui/Icon.astro';
+import Button from '../Button.astro';
+import WhatsAppCta from '../ui/WhatsAppCta.astro';
+import { CONTACT_EMAIL, FOUNDER_NAME, getWhatsAppLink, WHATSAPP_DISPLAY } from '../../data/site';
+import { toLocale } from '../../i18n/config';
+import { routePath } from '../../i18n/routes';
+import { useTranslations } from '../../i18n/ui';
+import { about } from '../../i18n/pages/about';
+
+import studioImg from '../../assets/about/studio.jpg';
+import founderImg from '../../assets/about/founder.png';
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang);
+const page = t.pages.about;
+const c = about[lang];
+const whatsappHref = getWhatsAppLink(lang);
+const mailHref = `mailto:${CONTACT_EMAIL}`;
+const pad = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<PageLayout title={page.seoTitle} description={page.sub}>
+  <!-- Hero -->
+  <section class="relative overflow-hidden bg-surface pb-20 pt-28 md:pb-28 md:pt-32">
+    <div class="about-glow pointer-events-none absolute" aria-hidden="true"></div>
+    <div class="container-page relative">
+      <Breadcrumbs items={[{ label: t.nav.home, href: routePath(lang, 'home') }, { label: t.nav.about }]} />
+      <h1 class="mt-8 max-w-4xl text-display-sm text-cream md:text-display">
+        {page.title} <span class="text-orange">{page.highlight}</span>
+      </h1>
+      <p class="mt-6 max-w-2xl text-body-lg text-cream/75">{page.sub}</p>
+      <div class="mt-8 flex flex-wrap gap-3 sm:gap-4">
+        <Button href={whatsappHref} icon="chat" size="lg">{c.ctaWhatsapp}</Button>
+        <Button href={mailHref} variant="secondary" icon="mail" size="lg" class="max-w-full break-all">{CONTACT_EMAIL}</Button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quiénes somos -->
+  <section class="bg-ink py-20 lg:py-28" aria-labelledby="who-title">
+    <div class="container-page grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="relative pb-10 lg:col-span-5" data-reveal>
+        <div class="overflow-hidden rounded-2xl bg-surface-1">
+          <Image
+            src={studioImg}
+            alt={c.who.imageAlt}
+            widths={[480, 800]}
+            sizes="(min-width: 1024px) 440px, 100vw"
+            class="h-80 w-full object-cover grayscale-[30%] transition-[filter] duration-700 hover:grayscale-0 sm:h-[28rem] lg:h-[34rem]"
+            loading="lazy"
+          />
+        </div>
+        <div class="absolute bottom-0 right-4 max-w-xs rounded-xl bg-surface-2 p-5 shadow-2xl sm:-right-6">
+          <p class="eyebrow">{c.who.commitmentLabel}</p>
+          <p class="mt-1 text-h3 text-cream">{c.who.commitment}</p>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-6 lg:col-span-7">
+        <SectionIntro id="who-title" eyebrow={c.who.eyebrow} title={c.who.title} align="left" />
+        <div class="flex flex-col gap-4 text-body text-cream/75" data-reveal>
+          <p>{c.who.p1}</p>
+          <p>{c.who.p2}</p>
+        </div>
+        <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {
+            c.who.values.map((v, i) => (
+              <li class="flex flex-col gap-2 rounded-xl bg-surface-1 p-5" data-reveal style={`transition-delay:${i * 80}ms`}>
+                <Icon name={v.icon} class="size-6 text-orange" />
+                <h3 class="text-h3 text-cream">{v.title}</h3>
+                <p class="text-body-sm text-cream/70">{v.desc}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Detrás de LJ Solutions -->
+  <section class="about-founder relative overflow-hidden border-t border-white/5 bg-ink py-20 lg:py-28" aria-labelledby="founder-title">
+    <div class="container-page grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="relative mx-auto w-full max-w-md pb-10 lg:col-span-5 lg:max-w-none" data-reveal>
+        <div class="overflow-hidden rounded-2xl border border-white/10 bg-surface-1">
+          <Image
+            src={founderImg}
+            alt={c.founder.photoAlt}
+            widths={[400, 640, 900]}
+            sizes="(min-width: 1024px) 430px, (min-width: 448px) 448px, 100vw"
+            class="aspect-[4/5] w-full object-cover object-top grayscale"
+            loading="lazy"
+          />
+        </div>
+        <div class="absolute bottom-0 right-4 rounded-xl bg-surface-2 p-4 shadow-2xl sm:-right-6">
+          <p class="eyebrow">{c.founder.cardLabel}</p>
+          <p class="mt-1 text-h3 text-cream">{FOUNDER_NAME}</p>
+          <p class="text-body-sm text-cream/70">{c.role}</p>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-6 lg:col-span-7">
+        <div class="flex flex-col gap-3" data-reveal>
+          <span class="eyebrow">{c.founder.eyebrow}</span>
+          <h2 id="founder-title" class="text-h1-sm text-cream md:text-h1">{c.founder.title}</h2>
+          <p class="flex flex-wrap items-center gap-3">
+            <span class="text-h3 text-cream">{FOUNDER_NAME}</span>
+            <span class="rounded-full bg-surface-2 px-3 py-1 text-label-md text-cream/80">{c.role}</span>
+          </p>
+        </div>
+        <blockquote class="border-l-2 border-orange pl-5 text-body-lg italic text-cream sm:text-xl sm:leading-8" data-reveal>
+          {c.founder.quote}
+        </blockquote>
+        <p class="text-body text-cream/75" data-reveal>{c.founder.body}</p>
+        <div class="flex flex-wrap items-center gap-4" data-reveal>
+          <Button href={whatsappHref} icon="chat">{c.founder.cta}</Button>
+          <span class="text-label-md text-cream/60">{c.founder.signature}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tres pilares -->
+  <section class="bg-surface py-20 lg:py-28" aria-labelledby="pillars-title">
+    <div class="container-page">
+      <SectionIntro id="pillars-title" eyebrow={c.pillars.eyebrow} title={c.pillars.title} sub={c.pillars.sub} align="left" class="mb-12" />
+      <ul class="grid grid-cols-1 gap-6 md:grid-cols-3">
+        {
+          c.pillars.items.map((p, i) => (
+            <li data-reveal style={`transition-delay:${i * 80}ms`}>
+              <a href={routePath(lang, p.route)} class="group flex h-full flex-col gap-4 rounded-2xl bg-surface-1 p-6 transition-colors hover:bg-surface-2">
+                <span class="flex size-12 items-center justify-center rounded-xl bg-surface-2 text-orange transition-colors group-hover:bg-surface-3">
+                  <Icon name={p.icon} class="size-6" />
+                </span>
+                <h3 class="text-h3 text-cream">{p.title}</h3>
+                <p class="flex-1 text-body-sm text-cream/70">{p.desc}</p>
+                <span class="mt-2 flex items-center justify-between rounded-lg bg-ink/60 px-3 py-2.5">
+                  <span class="eyebrow">{p.tag}</span>
+                  <Icon name="arrow_forward" class="size-[18px] text-orange transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Nuestra forma de trabajar -->
+  <section class="bg-ink py-20 lg:py-28" aria-labelledby="method-title">
+    <div class="container-page">
+      <SectionIntro id="method-title" eyebrow={c.method.eyebrow} title={c.method.title} sub={c.method.sub} align="left" class="mb-12" />
+      <ol class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          c.method.steps.map((s, i) => (
+            <li class="flex flex-col gap-2 rounded-2xl bg-surface-1 p-6" data-reveal style={`transition-delay:${i * 80}ms`}>
+              <span class="text-h1 font-extrabold text-orange/45" aria-hidden="true">{pad(i)}</span>
+              <h3 class="text-h3 text-cream">{s.title}</h3>
+              <p class="flex-1 text-body-sm text-cream/70">{s.desc}</p>
+              <span class="mt-4 h-1 w-12 rounded-full bg-orange/50" aria-hidden="true" />
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Canal oficial -->
+  <section class="bg-surface py-16 md:py-24" aria-labelledby="channel-title">
+    <div class="container-page">
+      <div class="channel-card relative isolate grid grid-cols-1 items-center gap-10 overflow-hidden rounded-3xl bg-surface-2 p-6 sm:p-10 lg:grid-cols-12 lg:p-16">
+        <div class="flex flex-col gap-6 lg:col-span-7">
+          <SectionIntro id="channel-title" eyebrow={c.channel.eyebrow} title={c.channel.title} sub={c.channel.sub} align="left" />
+          <ul class="flex flex-col gap-3">
+            {
+              [
+                { icon: 'person', label: c.channel.person, value: FOUNDER_NAME },
+                { icon: 'mail', label: c.channel.email, value: CONTACT_EMAIL, href: mailHref },
+                { icon: 'chat', label: c.channel.whatsapp, value: WHATSAPP_DISPLAY, href: whatsappHref },
+              ].map((row) => (
+                <li class="flex items-center gap-4 rounded-xl bg-ink/70 p-4">
+                  <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-2 text-orange">
+                    <Icon name={row.icon} class="size-5" />
+                  </span>
+                  <div class="min-w-0">
+                    <p class="text-label-md uppercase text-cream/70">{row.label}</p>
+                    {row.href ? (
+                      <a
+                        href={row.href}
+                        target={row.href.startsWith('http') ? '_blank' : undefined}
+                        rel={row.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        class="block break-all text-body-lg font-semibold text-cream hover:text-orange"
+                      >
+                        {row.value}
+                      </a>
+                    ) : (
+                      <p class="text-body-lg font-semibold text-cream">{row.value}</p>
+                    )}
+                  </div>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <div class="flex flex-col gap-4 rounded-2xl bg-surface-1 p-6 lg:col-span-5">
+          <h3 class="text-h3 text-cream sm:text-xl">{c.channel.cardTitle}</h3>
+          <p class="text-body-sm text-cream/70">{c.channel.cardBody}</p>
+          <Button href={whatsappHref} icon="chat" class="w-full">{c.channel.ctaWhatsapp}</Button>
+          <Button href={mailHref} variant="secondary" icon="mail" class="w-full">{c.channel.ctaEmail}</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <WhatsAppCta layout="center" bare title={c.cta.title} sub={c.cta.sub} />
+</PageLayout>
+
+<style>
+  .about-glow {
+    top: -10rem;
+    left: calc(50% - 26rem);
+    width: 52rem;
+    height: 30rem;
+    border-radius: 9999px;
+    background: rgb(255 77 0 / 0.08);
+    filter: blur(120px);
+  }
+
+  .about-founder::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: 45%;
+    width: 36rem;
+    height: 28rem;
+    border-radius: 9999px;
+    background: rgb(255 77 0 / 0.06);
+    filter: blur(120px);
+    pointer-events: none;
+  }
+
+  .channel-card::before {
+    content: '';
+    position: absolute;
+    top: -8rem;
+    right: -8rem;
+    width: 26rem;
+    height: 26rem;
+    border-radius: 9999px;
+    background: rgb(255 77 0 / 0.16);
+    filter: blur(100px);
+    pointer-events: none;
+    z-index: -1;
+  }
+</style>

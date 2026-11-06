@@ -1,0 +1,16 @@
+---
+/** Section title block from the Home design: short orange bar, title, subtitle. */
+interface Props {
+  title: string;
+  sub?: string;
+  id?: string;
+  class?: string;
+}
+const { title, sub, id, class: className = '' } = Astro.props;
+---
+
+<div class:list={['flex max-w-2xl flex-col gap-2', className]} data-reveal>
+  <span class="mb-2 h-1 w-12 rounded-full bg-orange" aria-hidden="true"></span>
+  <h2 id={id} class="text-h1-sm text-cream md:text-h1">{title}</h2>
+  {sub && <p class="text-body-lg text-cream/70">{sub}</p>}
+</div>

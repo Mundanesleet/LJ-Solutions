@@ -1,0 +1,183 @@
+---
+/**
+ * Contact form (Stitch "Envía los detalles de tu consulta").
+ * Fields: full name, email, business (optional), service, project description.
+ * Submits to Web3Forms, which emails the message to CONTACT_EMAIL. Validation runs
+ * in the browser with the design's messages; a hidden honeypot filters bots.
+ * Without an access key the form never pretends to send: it shows how to reach us
+ * by WhatsApp or email instead.
+ */
+import Button from '../Button.astro';
+import FormField from '../ui/FormField.astro';
+import ChoiceGroup from '../ui/ChoiceGroup.astro';
+import { CONTACT_EMAIL, getWhatsAppLink, WEB3FORMS_ACCESS_KEY } from '../../data/site';
+import { toLocale } from '../../i18n/config';
+import { contact } from '../../i18n/pages/contact';
+
+const lang = toLocale(Astro.currentLocale);
+const f = contact[lang].form;
+const options = [
+  { value: 'webDev', label: f.services.webDev, icon: 'devices' },
+  { value: 'aiAgents', label: f.services.aiAgents, icon: 'smart_toy' },
+  { value: 'management', label: f.services.management, icon: 'account_tree' },
+  { value: 'other', label: f.services.other, icon: 'add_task' },
+];
+const fallback = { whatsapp: getWhatsAppLink(lang), email: `mailto:${CONTACT_EMAIL}` };
+---
+
+<form
+  class="flex flex-col gap-5"
+  novalidate
+  data-contact-form
+  data-key={WEB3FORMS_ACCESS_KEY}
+  data-msg-sending={f.sending}
+  data-msg-success={f.success}
+  data-msg-error={f.error}
+  data-msg-unavailable={f.unavailable}
+  data-err-name={f.errors.name}
+  data-err-email={f.errors.email}
+  data-err-service={f.errors.service}
+  data-err-description={f.errors.description}
+  data-subject={f.emailSubject}
+>
+  <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+    <FormField name="name" label={f.name} required placeholder={f.namePlaceholder} autocomplete="name" maxlength={120} />
+    <FormField name="email" label={f.email} type="email" required placeholder={f.emailPlaceholder} autocomplete="email" maxlength={160} />
+  </div>
+  <FormField name="business" label={f.business} placeholder={f.businessPlaceholder} autocomplete="organization" maxlength={120} />
+  <ChoiceGroup name="service" legend={f.service} options={options} required />
+  <FormField name="description" label={f.description} type="textarea" required placeholder={f.descriptionPlaceholder} maxlength={3000} />
+
+  <!-- Honeypot: invisible to people, tempting to bots. -->
+  <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+  <div class="flex flex-col gap-4 pt-1 sm:flex-row sm:items-center">
+    <Button type="submit" trailingIcon="arrow_forward" size="lg" class="w-full sm:w-auto" data-submit>
+      {f.submit}
+    </Button>
+  </div>
+
+  <div class="hidden rounded-xl p-4 text-body-sm" role="status" aria-live="polite" data-form-status>
+    <p data-form-status-text></p>
+    <p class="mt-2 hidden flex-wrap gap-x-4 gap-y-1 font-semibold" data-form-fallback>
+      <a href={fallback.whatsapp} target="_blank" rel="noopener noreferrer" class="text-orange underline-offset-4 hover:underline">WhatsApp</a>
+      <a href={fallback.email} class="text-orange underline-offset-4 hover:underline">{CONTACT_EMAIL}</a>
+    </p>
+  </div>
+</form>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+
+  if (form) {
+    const d = form.dataset;
+    const status = form.querySelector<HTMLElement>('[data-form-status]')!;
+    const statusText = form.querySelector<HTMLElement>('[data-form-status-text]')!;
+    const fallback = form.querySelector<HTMLElement>('[data-form-fallback]')!;
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+    const submitLabel = submit.querySelector('span')!;
+    const idleLabel = submitLabel.textContent ?? '';
+    let attempted = false;
+
+    const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    const value = (name: string) => (new FormData(form).get(name)?.toString() ?? '').trim();
+
+    const rules: Record<string, () => string | null> = {
+      name: () => (value('name').length >= 2 ? null : d.errName!),
+      email: () => (EMAIL.test(value('email')) ? null : d.errEmail!),
+      service: () => (value('service') ? null : d.errService!),
+      description: () => (value('description').length >= 10 ? null : d.errDescription!),
+    };
+
+    const showError = (name: string, message: string | null) => {
+      const error = form.querySelector<HTMLElement>(`#field-${name}-error`);
+      if (error) error.textContent = message ?? '';
+      const controls = form.querySelectorAll<HTMLElement>(`[name="${name}"]`);
+      controls.forEach((c) => (message ? c.setAttribute('aria-invalid', 'true') : c.removeAttribute('aria-invalid')));
+    };
+
+    const validate = () => {
+      let firstInvalid: string | null = null;
+      for (const [name, rule] of Object.entries(rules)) {
+        const message = rule();
+        showError(name, message);
+        if (message && !firstInvalid) firstInvalid = name;
+      }
+      return firstInvalid;
+    };
+
+    // After the first attempt, errors clear as soon as a field becomes valid.
+    form.addEventListener('input', (e) => {
+      const name = (e.target as HTMLInputElement).name;
+      if (attempted && rules[name]) showError(name, rules[name]());
+    });
+    form.addEventListener('change', (e) => {
+      const name = (e.target as HTMLInputElement).name;
+      if (attempted && rules[name]) showError(name, rules[name]());
+    });
+
+    const setStatus = (kind: 'success' | 'error' | 'info', text: string, withFallback = false) => {
+      status.classList.remove('hidden', 'bg-orange/10', 'bg-surface-2', 'text-cream');
+      status.classList.add(kind === 'success' ? 'bg-surface-2' : 'bg-orange/10', 'text-cream');
+      statusText.textContent = text;
+      fallback.classList.toggle('hidden', !withFallback);
+      fallback.classList.toggle('flex', withFallback);
+    };
+
+    const setBusy = (busy: boolean) => {
+      submit.disabled = busy;
+      submitLabel.textContent = busy ? d.msgSending! : idleLabel;
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      attempted = true;
+      const invalid = validate();
+      if (invalid) {
+        form.querySelector<HTMLElement>(`[name="${invalid}"]`)?.focus();
+        return;
+      }
+
+      if (!d.key) {
+        setStatus('info', d.msgUnavailable!, true);
+        return;
+      }
+
+      const data = new FormData(form);
+      if (data.get('botcheck')) return; // bot
+
+      const serviceLabel =
+        form.querySelector<HTMLInputElement>('input[name="service"]:checked')?.closest('label')?.textContent?.trim() ?? '';
+      const payload = {
+        access_key: d.key,
+        subject: `${d.subject}${value('name')}`,
+        from_name: 'LJ Solutions — web',
+        replyto: value('email'),
+        name: value('name'),
+        email: value('email'),
+        business: value('business') || '—',
+        service: serviceLabel,
+        message: value('description'),
+        page: location.href,
+      };
+
+      setBusy(true);
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json.success) throw new Error(json.message || res.statusText);
+        form.reset();
+        attempted = false;
+        setStatus('success', d.msgSuccess!);
+      } catch {
+        setStatus('error', d.msgError!, true);
+      } finally {
+        setBusy(false);
+      }
+    });
+  }
+</script>

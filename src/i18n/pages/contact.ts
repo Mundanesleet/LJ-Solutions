@@ -1,0 +1,96 @@
+// Copy for the Contacto page (Stitch "LJ Solutions — Contacto") and its form.
+import type { Locale } from '../config';
+
+const es = {
+  card: {
+    label: 'Contacto directo',
+    role: 'Fundador & Desarrollador',
+    emailLabel: 'Correo oficial',
+    emailAction: 'Enviar correo directo',
+    whatsappLabel: 'WhatsApp oficial',
+    whatsappStatus: 'Activo',
+    directTitle: '¿Prefieres hablar directamente?',
+    directBody: 'Cuéntanos tu idea por WhatsApp y conversemos sobre tu proyecto.',
+    directCta: 'Escríbenos por WhatsApp',
+    note: 'Trato 100% directo y sin intermediarios. Toda comunicación es respondida personalmente por Alejandro Sossa para garantizar viabilidad y diseño técnico riguroso.',
+  },
+  form: {
+    title: 'Envía los detalles de tu consulta',
+    sub: 'Completa este formulario técnico. Evaluaremos tu propuesta y responderemos con agilidad.',
+    name: 'Nombre completo',
+    namePlaceholder: 'Ej. Carlos Mendoza',
+    email: 'Correo electrónico',
+    emailPlaceholder: 'tu@empresa.com',
+    business: 'Nombre del negocio o empresa',
+    businessPlaceholder: 'Ej. Nova Logistics S.A.',
+    service: 'Servicio de interés',
+    services: {
+      webDev: 'Desarrollo Web',
+      aiAgents: 'Agentes de IA',
+      management: 'Sistemas Gestión',
+      other: 'Otro',
+    },
+    description: 'Descripción del proyecto',
+    descriptionPlaceholder: 'Cuéntanos sobre tu negocio, tus objetivos o el problema que deseas resolver...',
+    submit: 'Enviar consulta',
+    errors: {
+      name: 'Por favor, ingresa tu nombre completo.',
+      email: 'Ingresa un correo electrónico válido.',
+      service: 'Selecciona el área técnica requerida.',
+      description: 'Describe brevemente las necesidades o alcance de tu idea.',
+    },
+    sending: 'Enviando…',
+    success: '¡Gracias! Recibimos tu consulta y te responderemos pronto.',
+    error: 'No pudimos enviar tu consulta. Inténtalo de nuevo o escríbenos por WhatsApp o correo.',
+    unavailable: 'El formulario todavía no está activo. Mientras tanto, escríbenos por WhatsApp o por correo y te respondemos directamente.',
+    emailSubject: 'Nueva consulta desde lj-solutions — ',
+  },
+};
+
+const en: typeof es = {
+  card: {
+    label: 'Direct contact',
+    role: 'Founder & Developer',
+    emailLabel: 'Official email',
+    emailAction: 'Send a direct email',
+    whatsappLabel: 'Official WhatsApp',
+    whatsappStatus: 'Active',
+    directTitle: 'Prefer to talk directly?',
+    directBody: "Tell us your idea on WhatsApp and let's talk about your project.",
+    directCta: 'Write to us on WhatsApp',
+    note: '100% direct, with no intermediaries. Every message is answered personally by Alejandro Sossa to ensure feasibility and rigorous technical design.',
+  },
+  form: {
+    title: 'Send us the details of your inquiry',
+    sub: "Fill in this form. We'll review your proposal and get back to you promptly.",
+    name: 'Full name',
+    namePlaceholder: 'e.g. Carlos Mendoza',
+    email: 'Email',
+    emailPlaceholder: 'you@company.com',
+    business: 'Business or company name',
+    businessPlaceholder: 'e.g. Nova Logistics Inc.',
+    service: 'Service of interest',
+    services: {
+      webDev: 'Web Development',
+      aiAgents: 'AI Agents',
+      management: 'Management Systems',
+      other: 'Other',
+    },
+    description: 'Project description',
+    descriptionPlaceholder: 'Tell us about your business, your goals or the problem you want to solve...',
+    submit: 'Send inquiry',
+    errors: {
+      name: 'Please enter your full name.',
+      email: 'Enter a valid email address.',
+      service: 'Select the area you need.',
+      description: 'Briefly describe your needs or the scope of your idea.',
+    },
+    sending: 'Sending…',
+    success: "Thank you! We received your inquiry and we'll get back to you soon.",
+    error: "We couldn't send your inquiry. Try again, or write to us on WhatsApp or by email.",
+    unavailable: "The form isn't active yet. In the meantime, write to us on WhatsApp or by email and we'll answer you directly.",
+    emailSubject: 'New inquiry from lj-solutions — ',
+  },
+};
+
+export const contact: Record<Locale, typeof es> = { es, en };

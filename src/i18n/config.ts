@@ -26,7 +26,9 @@ const BASE = import.meta.env.BASE_URL;
 /** Prepends the configured `base` to a root-relative path (e.g. "/favicon.svg"). */
 export function withBase(path: string): string {
   const trimmedBase = BASE.endsWith('/') ? BASE.slice(0, -1) : BASE;
-  if (path === '/') return trimmedBase || '/';
+  // The site root keeps its trailing slash ("/LJ-Solutions/"), matching how GitHub
+  // Pages serves it, so links and canonical URLs never point at a redirect.
+  if (path === '/') return `${trimmedBase}/`;
   return `${trimmedBase}${path}`;
 }
 
@@ -40,7 +42,8 @@ export function localizePath(lang: Locale, path: string): string {
   const [pathname, hash] = hasHash ? path.split(/(?=#)/) : [path, ''];
   const cleanPathname = pathname === '/' ? '' : pathname;
   const localePrefix = lang === DEFAULT_LOCALE ? '' : `/${lang}`;
-  const fullPath = `${localePrefix}${cleanPathname}` || '/';
+  // A locale's home keeps its trailing slash too ("/en/").
+  const fullPath = cleanPathname ? `${localePrefix}${cleanPathname}` : `${localePrefix}/`;
 
   return `${withBase(fullPath)}${hash}`;
 }

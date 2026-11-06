@@ -1,0 +1,117 @@
+---
+/**
+ * Pricing plan card (Stitch "Planes y precios"). Shows the official price only —
+ * no struck-through prices or promotional labels. The quote button opens WhatsApp
+ * with the plan already named in the message.
+ *   featured – orange tag, glow and primary button ("Más recomendado")
+ *   wide     – spans two columns with features in two columns (last plan)
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Button from '../Button.astro';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  id?: string;
+  tag: string;
+  icon: string;
+  title: string;
+  desc: string;
+  price: string;
+  features: string[];
+  image?: ImageMetadata;
+  imageAlt?: string;
+  cta: string;
+  ctaHref: string;
+  featured?: boolean;
+  wide?: boolean;
+  class?: string;
+}
+
+const {
+  id,
+  tag,
+  icon,
+  title,
+  desc,
+  price,
+  features,
+  image,
+  imageAlt = '',
+  cta,
+  ctaHref,
+  featured = false,
+  wide = false,
+  class: className = '',
+} = Astro.props;
+---
+
+<article
+  id={id}
+  class:list={[
+    'plan-card flex scroll-mt-28 flex-col justify-between gap-8 rounded-2xl p-6 transition-colors sm:p-7',
+    featured ? 'plan-card--featured relative bg-surface-1 ring-1 ring-orange/40' : 'bg-surface-low hover:bg-surface-1',
+    wide && 'md:col-span-2',
+    className,
+  ]}
+  data-reveal
+>
+  <div class="flex flex-col gap-6">
+    <div class="flex items-center justify-between gap-3">
+      <span
+        class:list={[
+          'rounded-full px-3 py-1 text-label-sm uppercase',
+          featured ? 'bg-orange text-ink' : 'bg-surface-2 text-cream',
+        ]}>{tag}</span
+      >
+      <Icon name={icon} class="size-[22px] text-orange" />
+    </div>
+
+    <div>
+      <h3 class="text-h3 font-bold text-cream sm:text-xl">{title}</h3>
+      <p class="mt-1.5 text-body-sm text-cream/70">{desc}</p>
+    </div>
+
+    {
+      image && (
+        <div class:list={['relative h-28 overflow-hidden rounded-xl border border-white/5', wide && 'md:max-w-sm']}>
+          <Image src={image} alt={imageAlt} widths={[400, 720]} sizes="(min-width: 1024px) 360px, 100vw" class="size-full object-cover" loading="lazy" />
+          <div class="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent" aria-hidden="true" />
+        </div>
+      )
+    }
+
+    <p class:list={['rounded-xl bg-ink p-4', wide && 'md:max-w-sm']}>
+      <span class="text-h2 font-extrabold text-orange">{price}</span>
+      <span class="ml-1 text-label-md font-normal text-cream/70">COP</span>
+    </p>
+
+    <ul class:list={['grid gap-3 text-body-sm text-cream', wide && 'md:grid-cols-2 md:gap-x-6']}>
+      {
+        features.map((f) => (
+          <li class="flex items-start gap-2.5">
+            <Icon name="check_circle" class="mt-px size-[18px] text-orange" />
+            <span>{f}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <Button
+    href={ctaHref}
+    variant={featured ? 'primary' : 'secondary'}
+    icon="chat"
+    class:list={['w-full', wide && 'md:w-auto md:self-start']}
+  >
+    {cta}
+  </Button>
+</article>
+
+<style>
+  /* The design also scales this card to 102%; skipped because the scroll-reveal
+     owns `transform`. The glow and orange ring carry the emphasis instead. */
+  .plan-card--featured {
+    box-shadow: 0 12px 40px rgb(255 77 0 / 0.18);
+  }
+</style>

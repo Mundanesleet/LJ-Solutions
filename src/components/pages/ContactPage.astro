@@ -1,0 +1,123 @@
+---
+/** Contacto (Stitch "LJ Solutions — Contacto"). */
+import PageLayout from '../../layouts/PageLayout.astro';
+import Breadcrumbs from '../ui/Breadcrumbs.astro';
+import Icon from '../ui/Icon.astro';
+import Button from '../Button.astro';
+import ContactForm from '../contact/ContactForm.astro';
+import { CONTACT_EMAIL, FOUNDER_NAME, getWhatsAppLink, WHATSAPP_DISPLAY } from '../../data/site';
+import { toLocale } from '../../i18n/config';
+import { routePath } from '../../i18n/routes';
+import { useTranslations } from '../../i18n/ui';
+import { contact } from '../../i18n/pages/contact';
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang);
+const page = t.pages.contact;
+const c = contact[lang];
+const whatsappHref = getWhatsAppLink(lang);
+---
+
+<PageLayout title={page.seoTitle} description={page.sub}>
+  <section class="relative overflow-hidden bg-surface pb-20 pt-28 md:pb-28 md:pt-32">
+    <div class="contact-glow pointer-events-none absolute" aria-hidden="true"></div>
+    <div class="container-page relative">
+      <Breadcrumbs items={[{ label: t.nav.home, href: routePath(lang, 'home') }, { label: t.nav.contact }]} />
+      <h1 class="mt-8 max-w-3xl text-display-sm text-cream md:text-display">
+        {page.title} <span class="text-orange">{page.highlight}</span>
+      </h1>
+      <p class="mt-6 max-w-2xl text-body-lg text-cream/75">{page.sub}</p>
+
+      <div class="mt-12 grid grid-cols-1 items-start gap-8 md:mt-16 lg:grid-cols-12">
+        <!-- Direct contact card -->
+        <aside class="contact-card relative flex flex-col gap-6 overflow-hidden rounded-2xl bg-surface-1 p-5 sm:p-8 lg:col-span-5" aria-label={c.card.label}>
+          <div class="flex items-center gap-4">
+            <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-surface-2 text-orange">
+              <Icon name="verified_user" class="size-6" />
+            </span>
+            <div>
+              <p class="eyebrow">{c.card.label}</p>
+              <p class="text-h2 text-cream">{FOUNDER_NAME}</p>
+              <p class="text-body-sm text-cream/70">{c.card.role}</p>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-3">
+            <div class="rounded-xl bg-surface-low p-4">
+              <div class="flex items-center justify-between gap-3">
+                <span class="flex items-center gap-2 text-label-md uppercase text-cream/80">
+                  <Icon name="mail" class="size-4 text-orange" />
+                  {c.card.emailLabel}
+                </span>
+                <a
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  class="inline-flex items-center gap-1 whitespace-nowrap text-label-md text-orange hover:text-cream"
+                  aria-label={c.card.emailAction}
+                >
+                  <span class="hidden sm:inline">{c.card.emailAction}</span>
+                  <Icon name="arrow_outward" class="size-4 sm:size-3.5" />
+                </a>
+              </div>
+              <a href={`mailto:${CONTACT_EMAIL}`} class="mt-2 block break-all text-body font-semibold text-cream hover:text-orange">{CONTACT_EMAIL}</a>
+            </div>
+
+            <div class="rounded-xl bg-surface-low p-4">
+              <div class="flex items-center justify-between gap-3">
+                <span class="flex items-center gap-2 text-label-md uppercase text-cream/80">
+                  <Icon name="chat" class="size-4 text-orange" />
+                  {c.card.whatsappLabel}
+                </span>
+                <span class="flex items-center gap-1.5 rounded-full bg-orange/10 px-2.5 py-0.5 text-label-md text-orange">
+                  <span class="size-1.5 rounded-full bg-orange"></span>
+                  {c.card.whatsappStatus}
+                </span>
+              </div>
+              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="mt-2 block text-body font-semibold text-cream hover:text-orange">
+                {WHATSAPP_DISPLAY}
+              </a>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-4 rounded-2xl bg-ink p-5 sm:p-6">
+            <h2 class="text-h3 text-cream sm:text-xl">{c.card.directTitle}</h2>
+            <p class="text-body-sm text-cream/70">{c.card.directBody}</p>
+            <Button href={whatsappHref} icon="send" class="w-full whitespace-nowrap px-4">{c.card.directCta}</Button>
+          </div>
+
+          <p class="flex items-start gap-3 text-body-sm text-cream/70">
+            <Icon name="lock_person" class="mt-0.5 size-5 text-orange" />
+            {c.card.note}
+          </p>
+        </aside>
+
+        <!-- Form -->
+        <div class="rounded-2xl bg-surface-1 p-6 sm:p-10 lg:col-span-7">
+          <h2 class="text-h2 text-cream sm:text-[1.75rem] sm:leading-9">{c.form.title}</h2>
+          <p class="mb-8 mt-2 text-body-sm text-cream/70">{c.form.sub}</p>
+          <ContactForm />
+        </div>
+      </div>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .contact-glow {
+    top: -12rem;
+    left: calc(50% - 22rem);
+    width: 44rem;
+    height: 30rem;
+    border-radius: 9999px;
+    background: rgb(255 77 0 / 0.09);
+    filter: blur(120px);
+  }
+
+  /* Orange hairline along the top edge of the contact card. */
+  .contact-card::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-orange), transparent 80%);
+  }
+</style>

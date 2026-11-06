@@ -1,0 +1,31 @@
+---
+/** Card with an icon tile, a title and a short text (guarantees, benefits, profiles). */
+import Icon from './Icon.astro';
+
+interface Props {
+  icon: string;
+  title: string;
+  desc: string;
+  /** "tile" = filled card (default); "plain" = no card background. */
+  variant?: 'tile' | 'plain';
+  delay?: number;
+  class?: string;
+}
+const { icon, title, desc, variant = 'tile', delay = 0, class: className = '' } = Astro.props;
+---
+
+<li
+  class:list={[
+    'flex flex-col gap-3',
+    variant === 'tile' && 'rounded-2xl bg-surface-1 p-6 transition-colors hover:bg-surface-2',
+    className,
+  ]}
+  data-reveal
+  style={delay ? `transition-delay:${delay}ms` : undefined}
+>
+  <span class="mb-2 flex size-11 items-center justify-center rounded-xl bg-surface-2 text-orange">
+    <Icon name={icon} class="size-[22px]" />
+  </span>
+  <h3 class="text-h3 text-cream">{title}</h3>
+  <p class="text-body-sm text-cream/70">{desc}</p>
+</li>

@@ -1,0 +1,140 @@
+---
+/** Desarrollo Web (Stitch "LJ Solutions — Desarrollo Web"). */
+import { Image } from 'astro:assets';
+import PageLayout from '../../layouts/PageLayout.astro';
+import ServiceHero from '../service/ServiceHero.astro';
+import PlanCard from '../service/PlanCard.astro';
+import SectionIntro from '../ui/SectionIntro.astro';
+import IconCard from '../ui/IconCard.astro';
+import Icon from '../ui/Icon.astro';
+import Faq from '../ui/Faq.astro';
+import WhatsAppCta from '../ui/WhatsAppCta.astro';
+import { getWhatsAppLink } from '../../data/site';
+import { formatCOP, PRICES } from '../../data/pricing';
+import { toLocale } from '../../i18n/config';
+import { routePath } from '../../i18n/routes';
+import { useTranslations } from '../../i18n/ui';
+import { webdev } from '../../i18n/pages/webdev';
+
+import heroImg from '../../assets/webdev/hero.jpg';
+import landingImg from '../../assets/webdev/format-landing.jpg';
+import multipageImg from '../../assets/webdev/format-multipage.jpg';
+import platformImg from '../../assets/webdev/format-platform.jpg';
+import landingSimpleImg from '../../assets/webdev/plan-landing-simple.jpg';
+import paymentsImg from '../../assets/webdev/plan-payments.jpg';
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang);
+const page = t.pages.webDev;
+const c = webdev[lang];
+
+const formatImages = [landingImg, multipageImg, platformImg];
+const planImages = {
+  landingSimple: landingSimpleImg,
+  landingFull: landingImg,
+  multipage: multipageImg,
+  bookingAdmin: platformImg,
+  bookingAdminPayments: paymentsImg,
+};
+const planId = (key: string) => `plan-${key}`;
+---
+
+<PageLayout title={page.seoTitle} description={page.sub}>
+  <ServiceHero
+    crumbs={[{ label: t.nav.home, href: routePath(lang, 'home') }, { label: t.nav.services }, { label: t.services.webDev }]}
+    title={page.title}
+    highlight={page.highlight}
+    sub={page.sub}
+    image={heroImg}
+    imageAlt={c.heroImageAlt}
+    primary={{ label: c.ctaQuote, href: getWhatsAppLink(lang) }}
+    secondary={{ label: c.ctaPlans, href: '#planes', icon: 'expand_more' }}
+  />
+
+  <!-- Formatos disponibles -->
+  <section class="bg-surface py-20 lg:py-28" aria-labelledby="formats-title">
+    <div class="container-page">
+      <SectionIntro id="formats-title" eyebrow={c.formats.eyebrow} title={c.formats.title} sub={c.formats.sub} />
+      <ul class="mt-12 grid grid-cols-1 gap-6 md:mt-16 md:grid-cols-3">
+        {
+          c.formats.items.map((f, i) => (
+            <li class="group flex flex-col rounded-2xl bg-surface-1 p-6 transition-colors hover:bg-surface-2 sm:p-8" data-reveal style={`transition-delay:${i * 80}ms`}>
+              <div class="overflow-hidden rounded-xl bg-ink">
+                <Image
+                  src={formatImages[i]}
+                  alt={f.alt}
+                  widths={[400, 720]}
+                  sizes="(min-width: 768px) 33vw, 100vw"
+                  class="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <div class="mt-6 flex items-center justify-between">
+                <span class="eyebrow">{f.label}</span>
+                <Icon name={f.icon} class="size-[22px] text-orange" />
+              </div>
+              <h3 class="mt-3 text-h3 font-bold text-cream sm:text-xl">{f.title}</h3>
+              <p class="mt-3 flex-1 text-body-sm text-cream/70">{f.desc}</p>
+              <a href={`#${planId(f.plan)}`} class="mt-6 inline-flex w-fit items-center gap-1.5 text-label text-orange transition-colors hover:text-cream">
+                {f.link}
+                <Icon name="arrow_forward" class="size-[18px] transition-transform group-hover:translate-x-0.5" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Planes y precios -->
+  <section id="planes" class="scroll-mt-20 bg-ink py-20 lg:py-28" aria-labelledby="plans-title">
+    <div class="container-page">
+      <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+        <SectionIntro id="plans-title" title={c.plans.title} sub={c.plans.sub} align="left" />
+        <p class="flex flex-col gap-1 text-label-md md:text-right" data-reveal>
+          <span class="text-cream/80">{c.plans.noteCurrency}</span>
+          <span class="text-orange">• {c.plans.noteDelivery}</span>
+        </p>
+      </div>
+
+      <div class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {
+          c.plans.items.map((p, i) => {
+            const price = formatCOP(PRICES.webDev[p.key]);
+            return (
+              <PlanCard
+                id={planId(p.key)}
+                tag={p.tag}
+                icon={p.icon}
+                title={p.title}
+                desc={p.desc}
+                price={price}
+                features={p.features}
+                image={planImages[p.key]}
+                imageAlt={c.plans.imageAlt(p.title)}
+                cta={c.plans.quote}
+                ctaHref={getWhatsAppLink(lang, c.plans.planMessage(p.title, price))}
+                featured={p.featured}
+                wide={i === c.plans.items.length - 1}
+              />
+            );
+          })
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ¿Qué incluyen todos nuestros proyectos? -->
+  <section class="bg-surface py-20 lg:py-28" aria-labelledby="included-title">
+    <div class="container-page">
+      <SectionIntro id="included-title" eyebrow={c.included.eyebrow} title={c.included.title} sub={c.included.sub} />
+      <ul class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {c.included.items.map((item, i) => <IconCard {...item} delay={i * 80} />)}
+      </ul>
+    </div>
+  </section>
+
+  <Faq intro={c.faq.intro} items={c.faq.items} whatsappMessage={c.faq.message} />
+
+  <WhatsAppCta title={c.cta.title} sub={c.cta.sub} cta={c.cta.button} arrow />
+</PageLayout>

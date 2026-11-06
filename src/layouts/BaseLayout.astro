@@ -1,7 +1,8 @@
 ---
 import '../styles/global.css';
 import { SITE } from '../data/site';
-import { LOCALES, localizePath, toBarePath, toLocale, withBase } from '../i18n/config';
+import { LOCALES, localizePath, toBarePath, toLocale, withBase, type Locale } from '../i18n/config';
+import { routeKeyFor, routePath } from '../i18n/routes';
 import { useTranslations } from '../i18n/ui';
 
 interface Props {
@@ -18,7 +19,10 @@ const { title = t.seo.defaultTitle, description = t.seo.defaultDescription } = A
 // deployed origin, so canonical/OG/hreflang URLs never drift out of sync with it.
 const origin = Astro.site ?? new URL('http://localhost:4321');
 const barePath = toBarePath(Astro.url.pathname, lang);
-const canonicalURL = new URL(localizePath(lang, barePath), origin).toString();
+// Slugs are translated (/nosotros/ ↔ /en/about/), so alternates go through the route table.
+const routeKey = routeKeyFor(barePath, lang);
+const pathIn = (locale: Locale) => (routeKey ? routePath(locale, routeKey) : localizePath(locale, barePath));
+const canonicalURL = new URL(pathIn(lang), origin).toString();
 const ogImageURL = new URL(withBase('/og-image.png'), origin).toString();
 ---
 
@@ -36,10 +40,10 @@ const ogImageURL = new URL(withBase('/og-image.png'), origin).toString();
 
     {
       LOCALES.map((locale) => (
-        <link rel="alternate" hreflang={locale} href={new URL(localizePath(locale, barePath), origin).toString()} />
+        <link rel="alternate" hreflang={locale} href={new URL(pathIn(locale), origin).toString()} />
       ))
     }
-    <link rel="alternate" hreflang="x-default" href={new URL(localizePath('es', barePath), origin).toString()} />
+    <link rel="alternate" hreflang="x-default" href={new URL(pathIn('es'), origin).toString()} />
 
     <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
     <link rel="apple-touch-icon" href={withBase('/apple-touch-icon.png')} />
@@ -56,6 +60,8 @@ const ogImageURL = new URL(withBase('/og-image.png'), origin).toString();
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageURL} />
+
+    <slot name="head" />
 
     <noscript>
       <style>

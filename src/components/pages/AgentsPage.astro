@@ -1,0 +1,332 @@
+---
+/**
+ * Agentes de IA (Stitch "LJ Solutions — Agentes de IA (Funcionalidades Visuales)").
+ * The two chat illustrations are built in HTML (not images) so their text stays
+ * readable, translatable and sharp. They use WhatsApp's own dark-mode colours on
+ * purpose (approved for this page only).
+ */
+import { Image } from 'astro:assets';
+import PageLayout from '../../layouts/PageLayout.astro';
+import ServiceHero from '../service/ServiceHero.astro';
+import SectionIntro from '../ui/SectionIntro.astro';
+import Icon from '../ui/Icon.astro';
+import Button from '../Button.astro';
+import Faq from '../ui/Faq.astro';
+import WhatsAppCta from '../ui/WhatsAppCta.astro';
+import { getWhatsAppLink } from '../../data/site';
+import { formatCOP, PRICES } from '../../data/pricing';
+import { toLocale } from '../../i18n/config';
+import { routePath } from '../../i18n/routes';
+import { useTranslations } from '../../i18n/ui';
+import { agents } from '../../i18n/pages/agents';
+
+import heroImg from '../../assets/agents/hero.jpg';
+import supportImg from '../../assets/agents/cap-support.jpg';
+import agendaImg from '../../assets/agents/cap-agenda.jpg';
+import ordersImg from '../../assets/agents/cap-orders.jpg';
+import catalogImg from '../../assets/agents/cap-catalog.jpg';
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang);
+const page = t.pages.aiAgents;
+const c = agents[lang];
+const capImages = [supportImg, agendaImg, ordersImg, catalogImg];
+const pad = (i: number) => String(i + 1).padStart(2, '0');
+
+const basicPrice = formatCOP(PRICES.aiAgents.whatsappBasic);
+const fullPrice = formatCOP(PRICES.aiAgents.agendaCatalogWeb);
+const tr = c.what.trace;
+const ph = c.impact.phone;
+---
+
+<PageLayout title={page.seoTitle} description={page.sub}>
+  <ServiceHero
+    crumbs={[{ label: t.nav.home, href: routePath(lang, 'home') }, { label: t.nav.services }, { label: t.services.aiAgents }]}
+    title={page.title}
+    highlight={page.highlight}
+    highlightBreak
+    sub={page.sub}
+    image={heroImg}
+    imageAlt={c.heroImageAlt}
+    primary={{ label: c.ctaQuote, href: getWhatsAppLink(lang) }}
+    secondary={{ label: c.ctaPlans, href: '#planes', icon: 'arrow_downward' }}
+  />
+
+  <!-- ¿Qué es un agente de IA para WhatsApp? -->
+  <section class="bg-ink py-20 lg:py-28" aria-labelledby="what-title">
+    <div class="container-page grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="flex flex-col gap-8 lg:col-span-6">
+        <SectionIntro id="what-title" eyebrow={c.what.eyebrow} title={c.what.title} sub={c.what.sub} align="left" />
+        <ol class="flex flex-col gap-6">
+          {
+            c.what.steps.map((s, i) => (
+              <li class="flex gap-4" data-reveal style={`transition-delay:${i * 80}ms`}>
+                <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-2 text-label text-orange" aria-hidden="true">
+                  {pad(i)}
+                </span>
+                <div class="flex flex-col gap-1">
+                  <h3 class="text-h3 text-cream">{s.title}</h3>
+                  <p class="text-body text-cream/70">{s.desc}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+
+      <!-- Conversation trace illustration -->
+      <figure class="lg:col-span-6" data-reveal>
+        <div class="flex flex-col gap-5 rounded-2xl bg-surface-1 p-6 shadow-xl lg:p-8">
+          <div class="flex items-center justify-between gap-3 pb-1">
+            <span class="flex items-center gap-3 text-label font-bold text-cream">
+              <Icon name="terminal" class="size-6 text-orange" />
+              {tr.title}
+            </span>
+            <span class="flex shrink-0 items-center gap-1.5 rounded bg-[#0c1f17] px-2.5 py-1 text-label-sm text-whatsapp">
+              <span class="size-1.5 animate-pulse rounded-full bg-whatsapp motion-reduce:animate-none"></span>
+              {tr.active}
+            </span>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between text-xs text-cream/60">
+              <span class="flex items-center gap-1 font-semibold text-cream/80"><Icon name="person" class="size-3.5" /> {tr.userLabel}</span>
+              <span>{tr.userTime}</span>
+            </div>
+            <p class="rounded-xl bg-surface-2 p-3.5 text-body text-cream">{tr.userMessage}</p>
+          </div>
+
+          <div class="flex items-center gap-3.5 rounded-xl bg-surface-3 p-3.5 text-xs">
+            <Icon name="psychology" class="size-5 text-orange" />
+            <div class="flex-1">
+              <p class="font-semibold text-cream">{tr.intent}</p>
+              <p class="text-[11px] text-cream/60">{tr.entity}</p>
+            </div>
+            <span class="font-bold text-orange">{tr.latency}</span>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between text-xs text-cream/60">
+              <span class="flex items-center gap-1 font-semibold text-orange"><Icon name="smart_toy" class="size-3.5" /> {tr.aiLabel}</span>
+              <span>{tr.aiTime}</span>
+            </div>
+            <p class="rounded-xl bg-[#005c4b]/25 p-4 text-sm leading-relaxed text-cream">{tr.aiMessage}</p>
+          </div>
+
+          <div class="flex items-center justify-between gap-3 pt-1 text-xs text-cream/60">
+            <span>{tr.sync}</span>
+            <span class="flex shrink-0 items-center gap-1 font-semibold text-whatsapp"><Icon name="check" class="size-3.5" /> {tr.verified}</span>
+          </div>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Capacidades -->
+  <section class="bg-surface py-20 lg:py-28" aria-labelledby="caps-title">
+    <div class="container-page">
+      <SectionIntro id="caps-title" eyebrow={c.capabilities.eyebrow} title={c.capabilities.title} sub={c.capabilities.sub} class="mb-16 lg:mb-20" />
+      <div class="flex flex-col gap-20 lg:gap-28">
+        {
+          c.capabilities.items.map((cap, i) => {
+            const flip = i % 2 === 1;
+            return (
+              <article class="grid grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-16">
+                <div class:list={['group relative isolate lg:col-span-7', flip && 'lg:order-2']} data-reveal>
+                  <div class="absolute -inset-2 -z-10 rounded-3xl bg-gradient-to-tr from-orange/20 to-transparent opacity-75 blur-2xl" aria-hidden="true" />
+                  <div class="overflow-hidden rounded-2xl border border-white/10 bg-surface-1 shadow-2xl lg:rounded-3xl">
+                    <Image
+                      src={capImages[i]}
+                      alt={cap.alt}
+                      widths={[480, 800, 1200]}
+                      sizes="(min-width: 1024px) 640px, 100vw"
+                      class="h-auto w-full object-cover transition-transform duration-500 group-hover:scale-[1.01]"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+                <div class:list={['flex flex-col gap-5 lg:col-span-5', flip && 'lg:order-1']} data-reveal>
+                  <span class="eyebrow inline-flex w-fit items-center gap-2 rounded-full bg-orange/10 px-3 py-1.5 normal-case tracking-wide">
+                    {cap.badgeIcon ? (
+                      <Icon name={cap.badgeIcon} class="size-3.5" />
+                    ) : (
+                      <span class="size-1.5 rounded-full bg-orange" />
+                    )}
+                    <span class="uppercase">{cap.badge}</span>
+                  </span>
+                  <h3 class="text-h1-sm text-cream lg:text-h1">{cap.title}</h3>
+                  <p class="text-body-lg text-cream/70">{cap.desc}</p>
+                  <ul class="flex flex-col gap-3">
+                    {cap.points.map((p) => (
+                      <li class="flex items-start gap-3 text-body text-cream">
+                        <Icon name="check_circle" class="mt-0.5 size-5 text-orange" />
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </article>
+            );
+          })
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Impacto real -->
+  <section class="bg-ink py-20 lg:py-28" aria-labelledby="impact-title">
+    <div class="container-page grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="flex flex-col gap-8 lg:order-2 lg:col-span-7">
+        <SectionIntro id="impact-title" eyebrow={c.impact.eyebrow} title={c.impact.title} sub={c.impact.sub} align="left" />
+        <ul class="grid grid-cols-1 gap-8 sm:grid-cols-2">
+          {
+            c.impact.items.map((b, i) => (
+              <li class="flex flex-col gap-2" data-reveal style={`transition-delay:${i * 80}ms`}>
+                <span class="mb-1 flex size-9 items-center justify-center rounded-lg bg-surface-2 text-orange">
+                  <Icon name={b.icon} class="size-5" />
+                </span>
+                <h3 class="text-h3 text-cream">{b.title}</h3>
+                <p class="text-body text-cream/70">{b.desc}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- WhatsApp phone illustration -->
+      <figure class="flex justify-center lg:order-1 lg:col-span-5" aria-label={ph.aria} data-reveal>
+        <div class="w-full max-w-[320px] rounded-[38px] bg-surface-2 p-2.5 shadow-2xl">
+          <div class="flex flex-col overflow-hidden rounded-[30px] bg-[#0c1317] text-[12px] text-[#e9edef]">
+            <div class="flex items-center gap-2.5 bg-[#1f2c34] p-3">
+              <span class="flex size-7 items-center justify-center rounded-full bg-orange text-xs font-bold text-ink">LJ</span>
+              <div>
+                <p class="text-xs font-semibold leading-none">{ph.name}</p>
+                <p class="mt-1 text-[10px] text-whatsapp">{ph.status}</p>
+              </div>
+            </div>
+            <div class="flex flex-col gap-3 bg-[#0b141a] p-3.5">
+              <div class="flex flex-col gap-1 rounded-xl rounded-tl-none bg-[#202c33] p-3">
+                <p class="text-[11px] font-semibold text-whatsapp">{ph.label}</p>
+                <p class="leading-snug">{ph.message}</p>
+              </div>
+              <p class="ml-6 self-end rounded-xl rounded-tr-none bg-[#005c4b] p-2.5 text-right text-[11px]">{ph.reply}</p>
+              <div class="flex flex-col gap-2 rounded-xl rounded-tl-none bg-[#202c33] p-3">
+                <p class="text-[11px] text-[#8696a0]">{ph.actionsLabel}</p>
+                {ph.actions.map((a) => <span class="rounded bg-[#182229] p-2 text-center text-[11px] font-medium text-[#00a884]">{a}</span>)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Planes -->
+  <section id="planes" class="scroll-mt-20 bg-surface py-20 lg:py-28" aria-labelledby="plans-title">
+    <div class="container-page">
+      <SectionIntro id="plans-title" eyebrow={c.plans.eyebrow} title={c.plans.title} sub={c.plans.sub} class="mb-12 lg:mb-16" />
+      <div class="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8">
+        {
+          [
+            { p: c.plans.basic, price: basicPrice, full: false },
+            { p: c.plans.full, price: fullPrice, full: true },
+          ].map(({ p, price, full }) => (
+            <article
+              class:list={[
+                'relative isolate flex flex-col justify-between gap-10 overflow-hidden rounded-3xl p-8 lg:p-10',
+                full ? 'agent-plan--full bg-surface-1' : 'bg-surface-1',
+              ]}
+              data-reveal
+            >
+              <div class="flex flex-col gap-6">
+                <span
+                  class:list={[
+                    'w-fit text-label-sm uppercase',
+                    full ? 'rounded-full bg-orange/15 px-3 py-1.5 text-orange' : 'text-cream/70',
+                  ]}
+                >
+                  {p.tag}
+                </span>
+                <div class="flex flex-col gap-3">
+                  <h3 class="text-h1-sm text-cream lg:text-h1">{p.title}</h3>
+                  <p class="text-body text-cream/70">{p.desc}</p>
+                </div>
+                <div>
+                  <p class="text-label-md uppercase text-cream/70">{c.plans.investment}</p>
+                  <p class="mt-2 flex items-baseline gap-2">
+                    <span class:list={['text-[2.5rem] font-extrabold leading-none tracking-tight lg:text-[3.5rem]', full ? 'text-orange' : 'text-cream']}>
+                      {price}
+                    </span>
+                    <span class="text-label-md text-cream/70">COP</span>
+                  </p>
+                </div>
+                <div class="flex flex-col gap-3">
+                  <p class="text-label-md uppercase text-cream">{p.includes}</p>
+                  <ul class="flex flex-col gap-3">
+                    {p.features.map((f) => (
+                      <li class="flex items-start gap-3 text-body text-cream">
+                        <Icon name="check_circle" class="mt-0.5 size-5 text-orange" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <Button
+                href={getWhatsAppLink(lang, c.plans.message(p.title, price))}
+                variant={full ? 'primary' : 'secondary'}
+                icon={full ? 'rocket_launch' : 'chat'}
+                size="lg"
+                class="w-full"
+              >
+                {p.cta}
+              </Button>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Metodología -->
+  <section class="bg-ink py-20 lg:py-28" aria-labelledby="method-title">
+    <div class="container-page">
+      <SectionIntro id="method-title" eyebrow={c.method.eyebrow} title={c.method.title} sub={c.method.sub} align="left" class="mb-12 lg:mb-16" />
+      <ol class="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+        {
+          c.method.steps.map((s, i) => (
+            <li class="flex flex-col gap-3" data-reveal style={`transition-delay:${i * 80}ms`}>
+              <div class="mb-2 flex items-center gap-3" aria-hidden="true">
+                <span class="rounded-full bg-surface-2 px-3 py-1.5 text-label font-bold text-orange">{pad(i)}</span>
+                <span class="h-px flex-1 bg-white/10" />
+              </div>
+              <h3 class="text-h3 text-cream">{s.title}</h3>
+              <p class="text-body text-cream/70">{s.desc}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <Faq intro={c.faq.intro} items={c.faq.items} whatsappMessage={c.faq.message} />
+
+  <WhatsAppCta layout="center" label={c.cta.label} title={c.cta.title} sub={c.cta.sub} />
+</PageLayout>
+
+<style>
+  /* Warm glow in the corner of the full-solution plan. */
+  .agent-plan--full::before {
+    content: '';
+    position: absolute;
+    top: -6rem;
+    right: -6rem;
+    width: 18rem;
+    height: 18rem;
+    border-radius: 9999px;
+    background: rgb(255 77 0 / 0.22);
+    filter: blur(70px);
+    pointer-events: none;
+    z-index: -1;
+  }
+</style>

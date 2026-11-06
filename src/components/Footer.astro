@@ -1,53 +1,100 @@
 ---
-import Logo from './Logo.astro';
-import { getFooterLinks, getSocialLinks, getTagline, SITE } from '../data/site';
-import { localizePath, toLocale } from '../i18n/config';
+/**
+ * Site footer, shared by every page. Layout follows the Stitch Home footer;
+ * content is limited to real data (no invented offices, profiles or legal pages).
+ */
+import Icon from './ui/Icon.astro';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import { CONTACT_EMAIL, getSocialLinks, SITE, WHATSAPP_DISPLAY } from '../data/site';
+import { toLocale } from '../i18n/config';
+import { routePath, SERVICE_ROUTES } from '../i18n/routes';
 import { useTranslations } from '../i18n/ui';
 
 const lang = toLocale(Astro.currentLocale);
-const t = useTranslations(lang).nav;
-const footerLinks = getFooterLinks(lang);
-const socialLinks = getSocialLinks(lang);
-const homeHref = localizePath(lang, '/#top');
+const t = useTranslations(lang);
+const social = getSocialLinks(lang);
 const year = new Date().getFullYear();
+
+const navLinks = [
+  { href: routePath(lang, 'home'), label: t.nav.home },
+  { href: routePath(lang, 'about'), label: t.nav.about },
+  { href: routePath(lang, 'contact'), label: t.nav.contact },
+];
+const serviceLinks = SERVICE_ROUTES.map((key) => ({ href: routePath(lang, key), label: t.services[key] }));
+
+const channels = [
+  { href: social.whatsapp, icon: 'brand-whatsapp', label: 'WhatsApp' },
+  { href: social.instagram, icon: 'brand-instagram', label: 'Instagram' },
+  { href: social.tiktok, icon: 'brand-tiktok', label: 'TikTok' },
+  { href: `mailto:${CONTACT_EMAIL}`, icon: 'mail', label: CONTACT_EMAIL },
+];
+
+const linkClass = 'text-body-sm text-cream/70 transition-colors hover:text-cream';
 ---
 
-<footer class="border-t border-white/10 py-16">
-  <div class="mx-auto max-w-content px-6">
-    <div class="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
-      <div class="max-w-xs">
-        <a href={homeHref} class="flex items-center gap-2.5" aria-label={t.homeAria}>
-          <Logo class="h-8 w-8" />
-          <span class="font-heading text-[15px] font-medium tracking-tight text-cream">LJ Solutions</span>
+<footer class="border-t border-white/5 bg-ink pb-10 pt-16 lg:pt-20" aria-label={t.footer.footerAria}>
+  <div class="container-page">
+    <div class="grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-12 lg:gap-x-10">
+      <div class="col-span-2 lg:col-span-5">
+        <a href={routePath(lang, 'home')} class="text-h2 tracking-tight" aria-label={t.nav.homeAria}>
+          <span class="text-cream">LJ</span> <span class="text-orange">Solutions</span>
         </a>
-        <p class="mt-4 text-sm leading-relaxed text-mist">{getTagline(lang)}</p>
+        <p class="mt-4 max-w-md text-body text-cream/70">{t.footer.description}</p>
+        <div class="mt-6 flex flex-col gap-2.5 text-label">
+          <a href={`mailto:${CONTACT_EMAIL}`} class="inline-flex w-fit items-center gap-2 text-cream transition-colors hover:text-orange">
+            <Icon name="alternate_email" class="size-[18px] text-orange" />
+            {CONTACT_EMAIL}
+          </a>
+          <a
+            href={social.whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex w-fit items-center gap-2 text-cream transition-colors hover:text-orange"
+          >
+            <Icon name="chat" class="size-[18px] text-orange" />
+            {WHATSAPP_DISPLAY}
+          </a>
+        </div>
       </div>
 
-      <nav class="grid grid-cols-2 gap-x-10 gap-y-3 sm:flex sm:gap-10" aria-label="Footer">
-        {
-          footerLinks.map((link) => (
-            <a href={link.href} class="text-sm text-mist transition-colors hover:text-cream">
-              {link.label}
-            </a>
-          ))
-        }
+      <nav class="lg:col-span-2" aria-label={t.footer.navHeading}>
+        <h2 class="text-h3 text-cream">{t.footer.navHeading}</h2>
+        <ul class="mt-4 flex flex-col gap-2.5">
+          {navLinks.map((l) => <li><a href={l.href} class={linkClass}>{l.label}</a></li>)}
+        </ul>
       </nav>
 
-      <div class="flex gap-5">
-        <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" class="text-sm text-mist transition-colors hover:text-orange">
-          Instagram
-        </a>
-        <a href={socialLinks.tiktok} target="_blank" rel="noopener noreferrer" class="text-sm text-mist transition-colors hover:text-orange">
-          TikTok
-        </a>
-        <a href={socialLinks.whatsapp} target="_blank" rel="noopener noreferrer" class="text-sm text-mist transition-colors hover:text-orange">
-          WhatsApp
-        </a>
+      <nav class="lg:col-span-2" aria-label={t.footer.servicesHeading}>
+        <h2 class="text-h3 text-cream">{t.footer.servicesHeading}</h2>
+        <ul class="mt-4 flex flex-col gap-2.5">
+          {serviceLinks.map((l) => <li><a href={l.href} class={linkClass}>{l.label}</a></li>)}
+        </ul>
+      </nav>
+
+      <div class="col-span-2 lg:col-span-3">
+        <h2 class="text-h3 text-cream">{t.footer.connectHeading}</h2>
+        <ul class="mt-4 flex gap-2.5">
+          {
+            channels.map((c) => (
+              <li>
+                <a
+                  href={c.href}
+                  target={c.href.startsWith('http') ? '_blank' : undefined}
+                  rel={c.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  class="flex size-11 items-center justify-center rounded-full bg-surface-1 text-cream/75 transition-colors hover:bg-surface-2 hover:text-orange"
+                >
+                  <Icon name={c.icon} class="size-5" label={c.label} />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
       </div>
     </div>
 
-    <div class="mt-14 border-t border-white/10 pt-6">
-      <p class="text-xs text-mist/70">© {year} {SITE.name}</p>
+    <div class="mt-14 flex flex-col-reverse gap-4 border-t border-white/5 pt-6 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-body-sm text-cream/60">© {year} {SITE.name}. {t.footer.rights}</p>
+      <LanguageSwitcher class="inline-flex w-fit -ml-3 sm:ml-0" />
     </div>
   </div>
 </footer>

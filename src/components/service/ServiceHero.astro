@@ -1,0 +1,119 @@
+---
+/**
+ * Hero for the service pages.
+ *   layout="panoramic" – full-bleed photo with a left-to-right ink gradient and the
+ *                        copy over it (Desarrollo Web, Agentes IA)
+ *   layout="centered"  – centred copy with the photo as a framed panel below it
+ *                        (Sistemas de Gestión)
+ * The photo is the page's LCP element, so it loads eagerly with high priority.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Button from '../Button.astro';
+import Breadcrumbs from '../ui/Breadcrumbs.astro';
+
+interface Props {
+  crumbs: { label: string; href?: string }[];
+  title: string;
+  highlight: string;
+  /** Put the highlight on its own line (Agentes IA, Sistemas de Gestión). */
+  highlightBreak?: boolean;
+  sub: string;
+  image: ImageMetadata;
+  imageAlt: string;
+  primary: { label: string; href: string };
+  secondary: { label: string; href: string; icon: string };
+  layout?: 'panoramic' | 'centered';
+}
+
+const {
+  crumbs,
+  title,
+  highlight,
+  highlightBreak = false,
+  sub,
+  image,
+  imageAlt,
+  primary,
+  secondary,
+  layout = 'panoramic',
+} = Astro.props;
+const centered = layout === 'centered';
+---
+
+{
+  centered ? (
+    <section class="relative overflow-hidden bg-surface pb-16 pt-28 md:pb-24 md:pt-32">
+      <div class="container-page">
+        <Breadcrumbs items={crumbs} />
+        <div class="mx-auto mt-10 flex max-w-4xl flex-col items-center gap-6 text-center md:mt-14">
+          <h1 class="text-display-sm text-cream md:text-display">
+            {title}
+            {highlightBreak && <br class="hidden sm:inline" />} <span class="text-orange">{highlight}</span>
+          </h1>
+          <p class="max-w-2xl text-body-lg text-cream/75">{sub}</p>
+          <div class="flex flex-wrap justify-center gap-3 pt-2 sm:gap-4">
+            <Button href={primary.href} icon="chat" size="lg">
+              {primary.label}
+            </Button>
+            <Button href={secondary.href} variant="secondary" size="lg" trailingIcon={secondary.icon}>
+              {secondary.label}
+            </Button>
+          </div>
+        </div>
+        <div class="mt-12 overflow-hidden rounded-2xl bg-surface-low shadow-2xl md:mt-16">
+          <Image
+            src={image}
+            alt={imageAlt}
+            widths={[640, 1024, 1408]}
+            sizes="(min-width: 1280px) 1120px, 100vw"
+            class="aspect-[16/9] w-full object-cover md:aspect-[1408/768]"
+            loading="eager"
+            fetchpriority="high"
+          />
+        </div>
+      </div>
+    </section>
+  ) : (
+    <section class="relative flex min-h-[600px] items-center overflow-hidden bg-ink lg:min-h-[720px]">
+      <Image
+        src={image}
+        alt={imageAlt}
+        widths={[640, 1024, 1376]}
+        sizes="100vw"
+        class="pointer-events-none absolute inset-0 size-full object-cover object-[70%_center] md:object-center"
+        loading="eager"
+        fetchpriority="high"
+      />
+      <div class="pointer-events-none absolute inset-0 bg-gradient-to-r from-ink via-ink/85 to-ink/30 md:w-3/5 md:to-transparent" aria-hidden="true" />
+      <div class="pointer-events-none absolute inset-0 bg-ink/25" aria-hidden="true" />
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-ink to-transparent" aria-hidden="true" />
+
+      <div class="container-page relative pb-20 pt-32 lg:pb-28 lg:pt-36">
+        <div class="flex max-w-2xl flex-col items-start lg:max-w-3xl">
+          <Breadcrumbs items={crumbs} class="mb-6" />
+          <h1 class="hero-shadow text-display-sm text-cream md:text-display">
+            {title}
+            {highlightBreak && <br />} <span class="text-orange">{highlight}</span>
+          </h1>
+          <p class="hero-shadow mt-6 max-w-xl text-body-lg text-cream/80 sm:text-xl sm:leading-8">{sub}</p>
+          <div class="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
+            <Button href={primary.href} icon="chat" size="lg">
+              {primary.label}
+            </Button>
+            <Button href={secondary.href} variant="secondary" size="lg" trailingIcon={secondary.icon}>
+              {secondary.label}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  /* Keeps type crisp over the brightest parts of the photo (as in the design). */
+  .hero-shadow {
+    text-shadow: 0 2px 16px rgb(0 0 0 / 0.8);
+  }
+</style>

@@ -1,0 +1,125 @@
+---
+/** Sistemas de Gestión (Stitch "LJ Solutions — Sistemas de Gestión"). */
+import { Image } from 'astro:assets';
+import PageLayout from '../../layouts/PageLayout.astro';
+import ServiceHero from '../service/ServiceHero.astro';
+import SectionIntro from '../ui/SectionIntro.astro';
+import IconCard from '../ui/IconCard.astro';
+import Icon from '../ui/Icon.astro';
+import Button from '../Button.astro';
+import Faq from '../ui/Faq.astro';
+import WhatsAppCta from '../ui/WhatsAppCta.astro';
+import { getWhatsAppLink } from '../../data/site';
+import { formatCOP, PRICES } from '../../data/pricing';
+import { toLocale } from '../../i18n/config';
+import { routePath } from '../../i18n/routes';
+import { useTranslations } from '../../i18n/ui';
+import { management } from '../../i18n/pages/management';
+
+import heroImg from '../../assets/management/hero.jpg';
+import inventoryImg from '../../assets/management/inventory.jpg';
+import ordersImg from '../../assets/management/orders.jpg';
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang);
+const page = t.pages.management;
+const c = management[lang];
+const images = { inventory: inventoryImg, ordersCatalog: ordersImg };
+const price = (k: keyof typeof PRICES.management) => formatCOP(PRICES.management[k]);
+---
+
+<PageLayout title={page.seoTitle} description={page.sub}>
+  <ServiceHero
+    layout="centered"
+    crumbs={[{ label: t.nav.home, href: routePath(lang, 'home') }, { label: t.nav.services }, { label: t.services.management }]}
+    title={page.title}
+    highlight={page.highlight}
+    highlightBreak
+    sub={page.sub}
+    image={heroImg}
+    imageAlt={c.heroImageAlt}
+    primary={{ label: c.ctaQuote, href: getWhatsAppLink(lang) }}
+    secondary={{ label: c.ctaSolutions, href: '#soluciones', icon: 'south' }}
+  />
+
+  <!-- Estructura & claridad -->
+  <section class="bg-ink py-20 lg:py-24" aria-labelledby="intro-title">
+    <div class="container-page grid grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-12">
+      <SectionIntro id="intro-title" eyebrow={c.intro.eyebrow} title={c.intro.title} align="left" />
+      <p class="text-body-lg text-cream/75" data-reveal>{c.intro.body}</p>
+    </div>
+  </section>
+
+  <!-- Soluciones de gestión -->
+  <section id="soluciones" class="scroll-mt-20 bg-surface py-20 lg:py-28" aria-labelledby="solutions-title">
+    <div class="container-page">
+      <SectionIntro id="solutions-title" eyebrow={c.solutions.eyebrow} title={c.solutions.title} sub={c.solutions.sub} class="mb-12 lg:mb-16" />
+      <div class="flex flex-col gap-10 lg:gap-14">
+        {
+          c.solutions.items.map((s, i) => {
+            const p = price(s.key);
+            const flip = i % 2 === 1;
+            return (
+              <article class="grid grid-cols-1 items-center overflow-hidden rounded-2xl bg-surface-1 lg:grid-cols-2" data-reveal>
+                <div class:list={['bg-ink p-4 sm:p-6', flip && 'lg:order-2']}>
+                  <Image
+                    src={images[s.key]}
+                    alt={s.alt}
+                    widths={[480, 800, 1200]}
+                    sizes="(min-width: 1024px) 560px, 100vw"
+                    class="aspect-[16/9] w-full rounded-lg object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <div class:list={['flex flex-col gap-5 p-6 sm:p-10 lg:p-12', flip && 'lg:order-1']}>
+                  <span class="eyebrow">{s.label}</span>
+                  <h3 class="text-h2 text-cream lg:text-[1.75rem] lg:leading-9">{s.title}</h3>
+                  <p class="flex flex-wrap items-baseline gap-x-2">
+                    <span class="text-[2.25rem] font-extrabold leading-none tracking-tight text-cream lg:text-[2.75rem]">{p}</span>
+                    <span class="text-label font-bold text-orange">COP</span>
+                    <span class="text-body-sm text-cream/60">{c.solutions.oneTime}</span>
+                  </p>
+                  <p class="text-body text-cream/75">{s.desc}</p>
+                  <ul class="flex flex-col gap-2.5">
+                    {s.features.map((f) => (
+                      <li class="flex items-start gap-2.5 text-body text-cream">
+                        <Icon name="check_circle" class="mt-0.5 size-5 text-orange" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Button
+                    href={getWhatsAppLink(lang, c.solutions.message(s.title, p))}
+                    icon="chat"
+                    size="lg"
+                    class="mt-2 w-full sm:w-fit"
+                  >
+                    {s.cta}
+                  </Button>
+                </div>
+              </article>
+            );
+          })
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Adaptabilidad -->
+  <section class="bg-ink py-20 lg:py-28" aria-labelledby="fit-title">
+    <div class="container-page">
+      <SectionIntro id="fit-title" eyebrow={c.fit.eyebrow} title={c.fit.title} sub={c.fit.sub} class="mb-12" />
+      <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {c.fit.items.map((item, i) => <IconCard {...item} delay={i * 80} />)}
+      </ul>
+    </div>
+  </section>
+
+  <Faq
+    intro={c.faq.intro}
+    items={c.faq.items(price('inventory'), price('ordersCatalog'))}
+    whatsappMessage={c.faq.message}
+  />
+
+  <WhatsAppCta layout="center" title={c.cta.title} sub={c.cta.sub} cta={c.cta.button} />
+</PageLayout>

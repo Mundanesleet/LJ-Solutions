@@ -1,0 +1,73 @@
+---
+/**
+ * Closing call to action that opens WhatsApp (Stitch "FINAL CTA").
+ *   layout="split"  – copy left, button right (Home, Desarrollo Web)
+ *   layout="center" – centred copy with optional pill label (Agentes IA,
+ *                     Sistemas de Gestión, Nosotros)
+ */
+import Button from '../Button.astro';
+import { getWhatsAppLink } from '../../data/site';
+import { toLocale } from '../../i18n/config';
+import { useTranslations } from '../../i18n/ui';
+
+interface Props {
+  title: string;
+  sub: string;
+  /** Button label; defaults to "Hablemos por WhatsApp". */
+  cta?: string;
+  /** Small pill above the title (centre layout). */
+  label?: string;
+  whatsappMessage?: string;
+  layout?: 'split' | 'center';
+  /** Arrow after the button label (Desarrollo Web, Sistemas de Gestión). */
+  arrow?: boolean;
+  /** No card behind the copy (Nosotros). */
+  bare?: boolean;
+}
+
+const lang = toLocale(Astro.currentLocale);
+const t = useTranslations(lang).whatsapp;
+const { title, sub, cta = t.cta, label, whatsappMessage, layout = 'split', arrow = false, bare = false } = Astro.props;
+const href = getWhatsAppLink(lang, whatsappMessage);
+const center = layout === 'center';
+---
+
+<section class="bg-ink py-16 md:py-24">
+  <div class="container-page">
+    <div
+      class:list={[
+        'cta-card relative isolate',
+        !bare && 'overflow-hidden rounded-3xl bg-surface-1 p-8 shadow-2xl sm:p-12 md:p-16',
+        center && 'text-center',
+      ]}
+    >
+      {!bare && <div class="cta-card__flare pointer-events-none absolute -z-10" aria-hidden="true" />}
+
+      <div
+        class:list={[
+          'flex flex-col gap-8',
+          center ? 'items-center' : 'lg:flex-row lg:items-center lg:justify-between lg:gap-12',
+        ]}
+      >
+        <div class:list={['flex flex-col gap-3', center ? 'max-w-2xl items-center' : 'max-w-2xl']}>
+          {label && <span class="eyebrow w-fit rounded-full bg-ink px-3 py-1.5">{label}</span>}
+          <h2 class="text-h1-sm font-extrabold tracking-tight text-cream md:text-h1">{title}</h2>
+          <p class="text-body-lg text-cream/70">{sub}</p>
+        </div>
+        <div class="shrink-0">
+          <Button href={href} icon="chat" size="lg" trailingIcon={arrow ? 'arrow_forward' : undefined}>{cta}</Button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Incandescent glow rising from the bottom edge of the card. */
+  .cta-card__flare {
+    inset: auto -10% -45% 30%;
+    height: 90%;
+    background: radial-gradient(closest-side, rgb(255 77 0 / 0.28), transparent);
+    filter: blur(40px);
+  }
+</style>

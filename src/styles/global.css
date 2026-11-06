@@ -1,9 +1,15 @@
 @import "tailwindcss";
 
-@import "@fontsource-variable/space-grotesk";
-@import "@fontsource-variable/inter";
+@import "@fontsource-variable/plus-jakarta-sans";
 
+/*
+  Design tokens, taken from the approved Stitch designs and constrained to the
+  official palette. Stitch's Material-generated tints (salmon labels, pinkish body
+  text) are mapped back onto the palette: labels use orange, body text uses cream.
+  The surface greys are neutral steps of the official black, used for cards.
+*/
 @theme {
+  /* Official palette */
   --color-ink: #0a0a0a;
   --color-orange: #ff4d00;
   --color-orange-dim: #cc3d00;
@@ -11,27 +17,126 @@
   --color-paper: #ffffff;
   --color-mist: #a3a3a3;
 
-  --font-heading: "Space Grotesk Variable", "Space Grotesk", sans-serif;
-  --font-body: "Inter Variable", "Inter", sans-serif;
+  /* Neutral surfaces (darkest → lightest) */
+  --color-surface: #131313;
+  --color-surface-low: #1c1b1b;
+  --color-surface-1: #201f1f;
+  --color-surface-2: #2a2a2a;
+  --color-surface-3: #353534;
 
-  --container-content: 1280px;
+  /* WhatsApp brand green: only for the WhatsApp-styled UI on the AI agents page. */
+  --color-whatsapp: #25d366;
+
+  --font-heading: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-body: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", system-ui, sans-serif;
+
+  /* Type scale (Stitch: display-hero, headline-*, body-*, label-*) */
+  --text-display: 3.75rem;
+  --text-display--line-height: 4.25rem;
+  --text-display--letter-spacing: -0.03em;
+  --text-display--font-weight: 800;
+
+  --text-display-sm: 2.25rem;
+  --text-display-sm--line-height: 2.75rem;
+  --text-display-sm--letter-spacing: -0.025em;
+  --text-display-sm--font-weight: 800;
+
+  --text-h1: 2.5rem;
+  --text-h1--line-height: 3rem;
+  --text-h1--letter-spacing: -0.02em;
+  --text-h1--font-weight: 700;
+
+  --text-h1-sm: 1.75rem;
+  --text-h1-sm--line-height: 2.25rem;
+  --text-h1-sm--letter-spacing: -0.015em;
+  --text-h1-sm--font-weight: 700;
+
+  --text-h2: 1.5rem;
+  --text-h2--line-height: 2rem;
+  --text-h2--letter-spacing: -0.01em;
+  --text-h2--font-weight: 700;
+
+  --text-h3: 1.125rem;
+  --text-h3--line-height: 1.625rem;
+  --text-h3--letter-spacing: -0.005em;
+  --text-h3--font-weight: 600;
+
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.75rem;
+
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.5rem;
+
+  --text-body-sm: 0.8125rem;
+  --text-body-sm--line-height: 1.25rem;
+  --text-body-sm--letter-spacing: 0.01em;
+
+  --text-label: 0.875rem;
+  --text-label--line-height: 1.25rem;
+  --text-label--letter-spacing: 0.02em;
+  --text-label--font-weight: 600;
+
+  --text-label-md: 0.75rem;
+  --text-label-md--line-height: 1rem;
+  --text-label-md--letter-spacing: 0.04em;
+  --text-label-md--font-weight: 600;
+
+  --text-label-sm: 0.6875rem;
+  --text-label-sm--line-height: 0.875rem;
+  --text-label-sm--letter-spacing: 0.08em;
+  --text-label-sm--font-weight: 700;
+
+  --container-content: 80rem;
+
+  --shadow-glow: 0 4px 20px rgb(255 77 0 / 0.35);
+  --shadow-glow-lg: 0 12px 30px rgb(255 77 0 / 0.45);
+}
+
+/* Page container: 1280px max, Stitch's mobile / gutter / desktop margins. */
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--container-content);
+  padding-inline: 1.25rem;
+
+  @media (width >= 48rem) {
+    padding-inline: 1.5rem;
+  }
+
+  @media (width >= 64rem) {
+    padding-inline: 5rem;
+  }
+}
+
+/* Small uppercase section label ("FORMATOS DISPONIBLES"). */
+@utility eyebrow {
+  font-size: var(--text-label-sm);
+  line-height: var(--text-label-sm--line-height);
+  letter-spacing: var(--text-label-sm--letter-spacing);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-orange);
 }
 
 html {
   scroll-behavior: smooth;
   background-color: var(--color-ink);
+  /* Anchored sections clear the fixed 80px header. */
+  scroll-padding-top: 5.5rem;
 }
 
+/* No body background: html already paints ink, and a body background would cover
+   negative-z layers such as the fixed hero sculpture stage. */
 body {
   font-family: var(--font-body);
-  background-color: var(--color-ink);
   color: var(--color-cream);
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
 }
 
 h1, h2, h3, h4 {
   font-family: var(--font-heading);
-  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 @media (prefers-reduced-motion: reduce) {

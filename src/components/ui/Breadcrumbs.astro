@@ -1,0 +1,56 @@
+---
+/**
+ * Breadcrumb trail ("Inicio › Servicios › Desarrollo Web") plus its
+ * BreadcrumbList structured data. Items without href render as plain text
+ * (e.g. "Servicios", which has no overview page yet). The last item is the
+ * current page.
+ */
+import Icon from './Icon.astro';
+import { toLocale } from '../../i18n/config';
+import { useTranslations } from '../../i18n/ui';
+
+interface Props {
+  items: { label: string; href?: string }[];
+  class?: string;
+}
+
+const { items, class: className = '' } = Astro.props;
+const t = useTranslations(toLocale(Astro.currentLocale)).breadcrumb;
+const origin = Astro.site ?? new URL('http://localhost:4321');
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: items.map((item, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: item.label,
+    ...(item.href ? { item: new URL(item.href, origin).toString() } : {}),
+  })),
+};
+---
+
+<nav aria-label={t.aria} class={className}>
+  <ol class="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-label-md">
+    {
+      items.map((item, i) => {
+        const last = i === items.length - 1;
+        return (
+          <li class="inline-flex items-center gap-1.5">
+            {item.href && !last ? (
+              <a href={item.href} class="text-cream/70 transition-colors hover:text-orange">
+                {item.label}
+              </a>
+            ) : (
+              <span class:list={[last ? 'text-cream' : 'text-cream/70']} aria-current={last ? 'page' : undefined}>
+                {item.label}
+              </span>
+            )}
+            {!last && <Icon name="chevron_right" class="size-4 text-cream/40" />}
+          </li>
+        );
+      })
+    }
+  </ol>
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

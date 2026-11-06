@@ -1,0 +1,23 @@
+---
+/** Section heading for the inner pages: uppercase orange eyebrow, title, subtitle. */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  sub?: string;
+  align?: 'left' | 'center';
+  id?: string;
+  class?: string;
+}
+const { eyebrow, title, sub, align = 'center', id, class: className = '' } = Astro.props;
+const center = align === 'center';
+---
+
+<div
+  class:list={['flex flex-col gap-3', center ? 'mx-auto max-w-2xl items-center text-center' : 'max-w-2xl', className]}
+  data-reveal
+>
+  {eyebrow && <span class="eyebrow">{eyebrow}</span>}
+  <h2 id={id} class="text-h1-sm text-cream md:text-h1">{title}</h2>
+  {sub && <p class="text-body-lg text-cream/70">{sub}</p>}
+  <slot />
+</div>
